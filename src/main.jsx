@@ -3,9 +3,9 @@ import ReactDOM from "react-dom/client";
 
 function App() {
     return (
-        <div style={{ textAlign: "center", marginTop: "50px" }}>
+        <div style={{ textAlign: "center", marginTop: "50px", fontFamily: "Arial" }}>
             <h1>Friend Opinion</h1>
-            <p>Send me anonymous messages</p>
+            <p>Send me anonymous message</p>
         </div>
     );
 }
