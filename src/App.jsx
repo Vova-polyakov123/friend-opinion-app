@@ -10,22 +10,18 @@ export default function App() {
   const [answers, setAnswers] = useState([])
 
   const questions = [
-
     {
       q: "Этот человек тайно в кого-то влюблён?",
       a: ["Да", "Нет", "Возможно", "100%"]
     },
-
     {
       q: "Насколько он весёлый?",
       a: ["Очень", "Средне", "Редко", "Вообще нет"]
     },
-
     {
       q: "Можно ли ему доверять?",
       a: ["Да", "Не всегда", "Сомневаюсь", "Нет"]
     }
-
   ]
 
   useEffect(() => {
@@ -89,13 +85,9 @@ export default function App() {
     setAnswers(newAnswers)
 
     if (qIndex + 1 < questions.length) {
-
       setQIndex(qIndex + 1)
-
     } else {
-
       setScreen("result")
-
     }
 
   }
@@ -108,9 +100,13 @@ export default function App() {
 
   }
 
-  function invite() {
+  async function invite() {
 
-    bridge.send("VKWebAppShowInviteBox")
+    try {
+      await bridge.send("VKWebAppShowInviteBox")
+    } catch (e) {
+      console.log("Ошибка приглашения:", e)
+    }
 
   }
 
@@ -166,9 +162,7 @@ export default function App() {
             style={styles.friend}
             onClick={() => startQuiz(f)}
           >
-
             {f.first_name}
-
           </button>
 
         ))}
