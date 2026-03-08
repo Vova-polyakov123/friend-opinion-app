@@ -36,13 +36,11 @@ export default function App() {
 
         await bridge.send("VKWebAppInit")
 
-        // запрашиваем доступ к друзьям
         await bridge.send("VKWebAppGetAuthToken", {
           app_id: 54474085,
           scope: "friends"
         })
 
-        // получаем список друзей
         const res = await bridge.send("VKWebAppCallAPIMethod", {
           method: "friends.get",
           params: {
@@ -58,7 +56,6 @@ export default function App() {
 
         console.log("Ошибка VK:", e)
 
-        // тестовые друзья если API не дал список
         setFriends([
           { id: 1, first_name: "Алексей" },
           { id: 2, first_name: "Игорь" },
