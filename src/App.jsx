@@ -36,15 +36,29 @@ export default function App() {
 
         await bridge.send("VKWebAppInit")
 
+        // запрашиваем доступ к друзьям
+        await bridge.send("VKWebAppGetAuthToken", {
+          app_id: 54474085,
+          scope: "friends"
+        })
+
+        // получаем список друзей
         const res = await bridge.send("VKWebAppCallAPIMethod", {
           method: "friends.get",
-          params: { v: "5.131" }
+          params: {
+            order: "name",
+            fields: "photo_100",
+            v: "5.131"
+          }
         })
 
         setFriends(res.response.items)
 
-      } catch {
+      } catch (e) {
 
+        console.log("Ошибка VK:", e)
+
+        // тестовые друзья если API не дал список
         setFriends([
           { id: 1, first_name: "Алексей" },
           { id: 2, first_name: "Игорь" },
@@ -91,19 +105,15 @@ export default function App() {
 
   function sendResult() {
 
-    const text = `Про тебя прошли опрос 😏 Открой приложение`
-
     bridge.send("VKWebAppShowWallPostBox", {
-      message: text
+      message: "😏 Про тебя прошли опрос! Открой приложение и узнай ответы!"
     })
 
   }
 
   function invite() {
 
-    navigator.clipboard.writeText(window.location.href)
-
-    alert("Ссылка скопирована")
+    bridge.send("VKWebAppShowInviteBox")
 
   }
 
@@ -316,7 +326,7 @@ const styles = {
     background: "white",
     color: "black",
     cursor: "pointer",
-    width: "200px"
+    width: "220px"
   },
 
   answer: {
