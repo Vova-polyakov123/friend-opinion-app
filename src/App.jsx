@@ -32,7 +32,7 @@ export default function App() {
 
         await bridge.send("VKWebAppInit")
 
-        await bridge.send("VKWebAppGetAuthToken", {
+        const token = await bridge.send("VKWebAppGetAuthToken", {
           app_id: 54474085,
           scope: "friends"
         })
@@ -42,20 +42,23 @@ export default function App() {
           params: {
             order: "name",
             fields: "photo_100",
+            access_token: token.access_token,
             v: "5.131"
           }
         })
 
-        setFriends(res.response.items)
+        if (res.response) {
+          setFriends(res.response.items)
+        }
 
       } catch (e) {
 
-        console.log("Ошибка VK:", e)
+        console.log("VK error:", e)
 
         setFriends([
-          { id: 1, first_name: "Алексей" },
-          { id: 2, first_name: "Игорь" },
-          { id: 3, first_name: "Анна" }
+          { id: 1, first_name: "Алексей", photo_100: "" },
+          { id: 2, first_name: "Игорь", photo_100: "" },
+          { id: 3, first_name: "Анна", photo_100: "" }
         ])
 
       }
@@ -92,20 +95,33 @@ export default function App() {
 
   }
 
-  function sendResult() {
+  async function share() {
 
-    bridge.send("VKWebAppShowWallPostBox", {
-      message: "😏 Про тебя прошли опрос! Открой приложение и узнай ответы!"
-    })
+    try {
+
+      await bridge.send("VKWebAppShowWallPostBox", {
+        message: "🔥 Пройди опрос про друзей",
+        attachments: "https://vk.com/app54474085"
+      })
+
+    } catch (e) {
+
+      console.log("Share error:", e)
+
+    }
 
   }
 
   async function invite() {
 
     try {
+
       await bridge.send("VKWebAppShowInviteBox")
+
     } catch (e) {
-      console.log("Ошибка приглашения:", e)
+
+      console.log("Invite error:", e)
+
     }
 
   }
@@ -162,7 +178,17 @@ export default function App() {
             style={styles.friend}
             onClick={() => startQuiz(f)}
           >
+
+            {f.photo_100 && (
+              <img
+                src={f.photo_100}
+                style={styles.avatar}
+                alt=""
+              />
+            )}
+
             {f.first_name}
+
           </button>
 
         ))}
@@ -221,14 +247,14 @@ export default function App() {
       <div style={styles.bg}>
 
         <h2>
-          Опрос про {selectedFriend.first_name} завершён
+          Опрос завершён
         </h2>
 
         <button
           style={styles.button}
-          onClick={sendResult}
+          onClick={share}
         >
-          Отправить уведомление
+          📢 Поделиться
         </button>
 
         <button
@@ -283,7 +309,7 @@ const styles = {
 
   bg: {
     minHeight: "100vh",
-    background: "linear-gradient(135deg,#6a11cb,#2575fc,#ff416c)",
+    background: "linear-gradient(135deg,#0f172a,#1e1b4b,#312e81)",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -294,41 +320,50 @@ const styles = {
   },
 
   title: {
-    fontSize: "34px",
+    fontSize: "36px",
     marginBottom: "30px"
   },
 
   button: {
     padding: "14px 35px",
-    margin: "8px",
+    margin: "10px",
     fontSize: "18px",
-    borderRadius: "12px",
+    borderRadius: "14px",
     border: "none",
-    background: "#22c55e",
+    background: "linear-gradient(90deg,#22c55e,#16a34a)",
     color: "white",
     cursor: "pointer"
   },
 
   friend: {
-    padding: "12px 25px",
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    padding: "12px 20px",
     margin: "6px",
-    borderRadius: "10px",
+    borderRadius: "12px",
     border: "none",
     background: "white",
     color: "black",
     cursor: "pointer",
-    width: "220px"
+    width: "240px"
+  },
+
+  avatar: {
+    width: "40px",
+    height: "40px",
+    borderRadius: "50%"
   },
 
   answer: {
     padding: "12px",
     margin: "6px",
-    borderRadius: "10px",
+    borderRadius: "12px",
     border: "none",
     background: "white",
     color: "black",
     cursor: "pointer",
-    width: "250px"
+    width: "260px"
   },
 
   question: {
@@ -341,7 +376,7 @@ const styles = {
     padding: "10px 20px",
     borderRadius: "10px",
     border: "none",
-    background: "#333",
+    background: "#111",
     color: "white"
   },
 
