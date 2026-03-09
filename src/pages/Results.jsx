@@ -1,12 +1,40 @@
-export default function Results() {
-    return (
-        <div className="resultCard">
-            <h2>🔥 Тайное мнение друзей</h2>
-            <p>Кто-то считает тебя очень романтичным</p>
+import { useState } from "react";
+import bridge from "@vkontakte/vk-bridge";
 
-            <button>
-                Поделиться в VK
+export default function Results() {
+
+    const shareResult = () => {
+        bridge.send("VKWebAppShare", {
+            link: window.location.href
+        });
+    };
+
+    const inviteFriends = () => {
+        bridge.send("VKWebAppShowInviteBox");
+    };
+
+    const copyLink = () => {
+        navigator.clipboard.writeText(window.location.href);
+        alert("Ссылка скопирована");
+    };
+
+    return (
+        <div>
+
+            <h2>Результат</h2>
+
+            <button onClick={shareResult}>
+                Поделиться результатом
             </button>
+
+            <button onClick={inviteFriends}>
+                Пригласить друзей
+            </button>
+
+            <button onClick={copyLink}>
+                Скопировать ссылку
+            </button>
+
         </div>
     );
 }
