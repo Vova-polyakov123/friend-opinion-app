@@ -6,13 +6,13 @@ export default function App() {
   const [screen, setScreen] = useState("menu")
   const [userId, setUserId] = useState(null)
   const [friends, setFriends] = useState([])
+  const [search, setSearch] = useState("")
   const [selectedFriend, setSelectedFriend] = useState(null)
 
   const [qIndex, setQIndex] = useState(0)
   const [answers, setAnswers] = useState([])
 
   const [inbox, setInbox] = useState([])
-  const [messageCount] = useState(5)
 
   const questions = [
 
@@ -77,14 +77,10 @@ export default function App() {
     } catch {
 
       bridge.send("VKWebAppShowSnackbar", {
-        text: "⚠️ Без доступа к друзьям опрос ограничен"
+        text: "⚠️ Нужно разрешить доступ к друзьям"
       })
 
-      setFriends([
-        { id: 1, first_name: "Алексей", photo_100: "https://i.pravatar.cc/100?img=1" },
-        { id: 2, first_name: "Игорь", photo_100: "https://i.pravatar.cc/100?img=2" },
-        { id: 3, first_name: "Анна", photo_100: "https://i.pravatar.cc/100?img=3" }
-      ])
+      setFriends([])
 
     }
 
@@ -146,10 +142,22 @@ export default function App() {
         background_type: "image",
         url: "https://i.imgur.com/8Km9tLL.png",
         attachment: {
-          text: "😈 Пройди анонимный опрос про меня",
           type: "url",
           url: getLink()
         }
+      })
+
+    } catch { }
+
+  }
+
+  async function buyAnswer() {
+
+    try {
+
+      await bridge.send("VKWebAppShowOrderBox", {
+        type: "item",
+        item: "unlock_answer"
       })
 
     } catch { }
@@ -163,10 +171,6 @@ export default function App() {
       <div style={styles.bg}>
 
         <h1 style={styles.title}>🔥 Опрос про друзей</h1>
-
-        <div style={{ marginBottom: "20px" }}>
-          📩 Тебе написали {messageCount} человек
-        </div>
 
         <button
           style={styles.button}
@@ -201,13 +205,24 @@ export default function App() {
 
   if (screen === "friends") {
 
+    const filtered = friends.filter(f =>
+      f.first_name.toLowerCase().includes(search.toLowerCase())
+    )
+
     return (
 
       <div style={styles.bg}>
 
         <h2>Выбери друга</h2>
 
-        {friends.map(f => (
+        <input
+          placeholder="Поиск друга"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={styles.search}
+        />
+
+        {filtered.map(f => (
 
           <div key={f.id}
 
@@ -313,9 +328,9 @@ export default function App() {
 
             {m.text}
 
-            <button style={styles.unlock}>
+            <button style={styles.unlock} onClick={buyAnswer}>
 
-              🔒 Узнать кто ответил — 59₽
+              🔒 Узнать кто ответил — 3 голоса
 
             </button>
 
@@ -369,6 +384,14 @@ const styles = {
     color: "white",
     cursor: "pointer",
     boxShadow: "0 8px 20px rgba(0,0,0,0.3)"
+  },
+
+  search: {
+    padding: "10px",
+    borderRadius: "10px",
+    border: "none",
+    marginBottom: "15px",
+    width: "240px"
   },
 
   friend: {
