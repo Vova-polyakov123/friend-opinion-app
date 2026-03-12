@@ -132,8 +132,22 @@ export default function App() {
 
       await bridge.send("VKWebAppShowStoryBox", {
 
-        background_type: "image",
-        url: "https://i.imgur.com/8Km9tLL.png",
+        background_type: "gradient",
+        background_color_top: "#6a3cff",
+        background_color_bottom: "#ff4ecd",
+
+        sticker: {
+          sticker_type: "renderable",
+          renderable_sticker: {
+            content_type: "text",
+            text: "🔥 Тайное мнение друзей\nУзнай что думают о тебе",
+            style: {
+              bold: true,
+              color: "#ffffff",
+              size: 28
+            }
+          }
+        },
 
         attachment: {
           type: "url",
