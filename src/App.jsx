@@ -4,9 +4,12 @@ import bridge from "@vkontakte/vk-bridge"
 export default function App() {
 
   const [screen, setScreen] = useState("menu")
-  const [userId, setUserId] = useState(null)
+  const [user, setUser] = useState(null)
+
   const [friends, setFriends] = useState([])
   const [search, setSearch] = useState("")
+  const [friendsError, setFriendsError] = useState(false)
+
   const [selectedFriend, setSelectedFriend] = useState(null)
 
   const [qIndex, setQIndex] = useState(0)
@@ -14,36 +17,26 @@ export default function App() {
 
   const [inbox, setInbox] = useState([])
 
-  const questions = [
 
-    { q: "Этот человек тайно в кого-то влюблён?", a: ["Да", "Нет", "Возможно", "100%"] },
-    { q: "Этот человек хороший друг?", a: ["Лучший", "Нормальный", "Средний", "Плохой"] },
-    { q: "Можно ли ему доверять?", a: ["Да", "Иногда", "Сомневаюсь", "Нет"] },
-    { q: "Он часто думает о любви?", a: ["Да", "Иногда", "Редко", "Нет"] },
-    { q: "Этот человек популярный?", a: ["Очень", "Средне", "Не особо", "Нет"] },
-    { q: "Этот человек часто флиртует?", a: ["Да", "Иногда", "Редко", "Нет"] },
-    { q: "Этот человек скрывает секрет?", a: ["Да", "Возможно", "Не думаю", "Нет"] },
-
-  ]
-
-  const fakeMessages = [
-
-    "💘 Кто-то тайно влюблён в тебя",
-    "🔥 Ты очень нравишься одному другу",
-    "😏 Кто-то считает тебя очень привлекательным",
-    "🤫 Один друг не доверяет тебе",
-    "👀 Кто-то часто думает о тебе"
-
-  ]
+  // ---------------- INIT ----------------
 
   useEffect(() => {
 
     async function init() {
 
-      await bridge.send("VKWebAppInit")
+      try {
 
-      const user = await bridge.send("VKWebAppGetUserInfo")
-      setUserId(user.id)
+        await bridge.send("VKWebAppInit")
+
+        const userInfo = await bridge.send("VKWebAppGetUserInfo")
+
+        setUser(userInfo)
+
+      } catch (e) {
+
+        console.log(e)
+
+      }
 
     }
 
@@ -51,40 +44,75 @@ export default function App() {
 
   }, [])
 
-  async function loadFriends() {
+
+  // ---------------- ВОПРОСЫ ----------------
+
+  const baseQuestions = [
+    "Этот человек тайно в кого-то влюблён?",
+    "Он нравится противоположному полу?",
+    "Можно ли ему доверять?",
+    "Он хороший друг?",
+    "Этот человек популярный?",
+    "Он может предать?",
+    "Он добрый?",
+    "Он скрывает секрет?",
+    "Он весёлый?",
+    "Он кому-то сильно нравится?"
+  ]
+
+  const questions = []
+
+  for (let i = 0; i < 600; i++) {
+
+    questions.push({
+      q: baseQuestions[i % baseQuestions.length],
+      a: ["Да", "Нет", "Возможно", "100%"]
+    })
+
+  }
+
+
+  // ---------------- ДРУЗЬЯ ----------------
+
+  async function requestFriends() {
 
     try {
 
-      const token = await bridge.send("VKWebAppGetAuthToken", {
-        app_id: 54474085,
-        scope: "friends"
-      })
+      const res = await bridge.send("VKWebAppGetFriends")
 
-      const res = await bridge.send("VKWebAppCallAPIMethod", {
-        method: "friends.get",
-        params: {
-          order: "name",
-          fields: "photo_100",
-          access_token: token.access_token,
-          v: "5.131"
-        }
-      })
+      const list = res.items || res.users || []
 
-      if (res.response) {
-        setFriends(res.response.items)
-      }
+      setFriends(list)
 
-    } catch {
+      setFriendsError(false)
 
-      bridge.send("VKWebAppShowSnackbar", {
-        text: "⚠️ Нужно разрешить доступ к друзьям"
-      })
+      setScreen("friends")
 
-      setFriends([])
+    } catch (e) {
+
+      console.log(e)
+
+      setFriendsError(true)
+
+      alert("Нужно разрешить доступ к друзьям")
 
     }
 
   }
+
+
+  // ---------------- ПОИСК ----------------
+
+  const filteredFriends = friends.filter(f =>
+
+    (f.first_name + " " + (f.last_name || ""))
+      .toLowerCase()
+      .includes(search.toLowerCase())
+
+  )
+
+
+  // ---------------- QUIZ ----------------
 
   function startQuiz(friend) {
 
@@ -98,7 +126,7 @@ export default function App() {
 
   function answerClick(a) {
 
-    const newAnswers = [...answers, { q: questions[qIndex].q, a }]
+    const newAnswers = [...answers, a]
 
     setAnswers(newAnswers)
 
@@ -108,7 +136,7 @@ export default function App() {
 
     } else {
 
-      bridge.send("VKWebAppShowSnackbar", { text: "🔥 Ответ отправлен анонимно" })
+      setInbox([...inbox, "💌 Кто-то ответил про тебя"])
 
       setScreen("result")
 
@@ -116,53 +144,58 @@ export default function App() {
 
   }
 
-  function loadInbox() {
 
-    const fake = fakeMessages.map(t => ({ text: t }))
+  // ---------------- ПОКУПКА ----------------
 
-    setInbox(fake)
-
-    bridge.send("VKWebAppShowSnackbar", { text: "📩 Тебе пришёл новый ответ" })
-
-    setScreen("inbox")
-
-  }
-
-  function getLink() {
-
-    return `https://vk.com/app54474085#${userId}`
-
-  }
-
-  async function shareResult() {
-
-    try {
-
-      await bridge.send("VKWebAppShowStoryBox", {
-        background_type: "image",
-        url: "https://i.imgur.com/8Km9tLL.png",
-        attachment: {
-          type: "url",
-          url: getLink()
-        }
-      })
-
-    } catch { }
-
-  }
-
-  async function buyAnswer() {
+  async function buyVoices() {
 
     try {
 
       await bridge.send("VKWebAppShowOrderBox", {
         type: "item",
-        item: "unlock_answer"
+        item: "answers3"
       })
 
-    } catch { }
+      alert("Покупка завершена")
+
+    } catch (e) {
+
+      console.log(e)
+
+    }
 
   }
+
+
+  // ---------------- СТОРИС ----------------
+
+  async function shareStory() {
+
+    try {
+
+      await bridge.send("VKWebAppShowStoryBox", {
+
+        background_type: "image",
+        url: "https://i.imgur.com/8Km9tLL.png",
+
+        attachment: {
+          type: "url",
+          url: `https://vk.com/appXXXX#${user?.id}`,
+          text: "to_store"
+        }
+
+      })
+
+    } catch (e) {
+
+      alert("Ошибка сторис")
+
+    }
+
+  }
+
+
+  // ---------------- MENU ----------------
 
   if (screen === "menu") {
 
@@ -170,32 +203,47 @@ export default function App() {
 
       <div style={styles.bg}>
 
-        <h1 style={styles.title}>🔥 Опрос про друзей</h1>
+        <div style={styles.container}>
 
-        <button
-          style={styles.button}
-          onClick={() => {
-            loadFriends()
-            setScreen("friends")
-          }}>
+          <h1 style={styles.title}>
+            🔥 Тайное мнение друзей
+          </h1>
 
-          👥 Выбрать друга
+          <p style={styles.subtitle}>
+            Узнай что друзья думают о тебе
+          </p>
 
-        </button>
+          <button style={styles.btn} onClick={() => setScreen("intro")}>
+            👥 Начать
+          </button>
 
-        <button style={styles.button}
-          onClick={loadInbox}>
+          <button style={styles.btn} onClick={() => setScreen("inbox")}>
+            ✉ Мои ответы
+          </button>
 
-          📥 Мои ответы
+          <button style={styles.btn} onClick={shareStory}>
+            📲 Поделиться в сторис
+          </button>
 
-        </button>
+          <div style={styles.box}>
 
-        <button style={styles.button}
-          onClick={shareResult}>
+            <p>Пример сообщений</p>
 
-          🚀 Поделиться
+            <div style={styles.msg}>
+              ❤️ Кто-то тайно влюблён в тебя
+            </div>
 
-        </button>
+            <div style={styles.msg}>
+              🔥 Ты очень нравишься одному другу
+            </div>
+
+            <button style={styles.lock} onClick={buyVoices}>
+              🔒 Узнать кто ответил — 3 голоса
+            </button>
+
+          </div>
+
+        </div>
 
       </div>
 
@@ -203,54 +251,106 @@ export default function App() {
 
   }
 
-  if (screen === "friends") {
 
-    const filtered = friends.filter(f =>
-      f.first_name.toLowerCase().includes(search.toLowerCase())
-    )
+  // ---------------- INTRO ----------------
+
+  if (screen === "intro") {
 
     return (
 
       <div style={styles.bg}>
 
-        <h2>Выбери друга</h2>
+        <div style={styles.card}>
 
-        <input
-          placeholder="Поиск друга"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={styles.search}
-        />
+          <h2>Как это работает</h2>
 
-        {filtered.map(f => (
+          <p>
 
-          <div key={f.id}
+            Ты выбираешь друга и отвечаешь на вопросы.
+            Ответы отправляются анонимно.
 
-            style={styles.friend}
+          </p>
 
-            onClick={() => startQuiz(f)}>
+          <button style={styles.btn} onClick={requestFriends}>
+            Продолжить
+          </button>
 
-            <img src={f.photo_100} style={styles.avatar} />
+          <button style={styles.btn} onClick={() => setScreen("menu")}>
+            Назад
+          </button>
 
-            <div>{f.first_name}</div>
-
-          </div>
-
-        ))}
-
-        <button style={styles.menu}
-
-          onClick={() => setScreen("menu")}>
-
-          Назад
-
-        </button>
+        </div>
 
       </div>
 
     )
 
   }
+
+
+  // ---------------- FRIENDS ----------------
+
+  if (screen === "friends") {
+
+    return (
+
+      <div style={styles.bg}>
+
+        <div style={styles.card}>
+
+          <h2>Выбери друга</h2>
+
+          <input
+            placeholder="Поиск друга"
+            style={styles.search}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+
+          {friendsError && (
+
+            <div>
+
+              <p>Нужно разрешить доступ к друзьям</p>
+
+              <button style={styles.btn} onClick={requestFriends}>
+                Разрешить доступ
+              </button>
+
+            </div>
+
+          )}
+
+          {filteredFriends.map(f => (
+
+            <div
+              key={f.id}
+              style={styles.friend}
+              onClick={() => startQuiz(f)}
+            >
+
+              <img src={f.photo_100} style={styles.avatar} />
+
+              {f.first_name}
+
+            </div>
+
+          ))}
+
+          <button style={styles.btn} onClick={() => setScreen("menu")}>
+            Назад
+          </button>
+
+        </div>
+
+      </div>
+
+    )
+
+  }
+
+
+  // ---------------- QUIZ ----------------
 
   if (screen === "quiz") {
 
@@ -260,29 +360,36 @@ export default function App() {
 
       <div style={styles.bg}>
 
-        <h2>{selectedFriend?.first_name}</h2>
+        <div style={styles.card}>
 
-        <h3 style={{ textAlign: "center" }}>{q.q}</h3>
+          <h2>{selectedFriend.first_name}</h2>
 
-        {q.a.map(a => (
+          <p>{q.q}</p>
 
-          <button key={a}
+          {q.a.map((a, i) => (
 
-            style={styles.button}
+            <button
+              key={i}
+              style={styles.answer}
+              onClick={() => answerClick(a)}
+            >
 
-            onClick={() => answerClick(a)}>
+              {a}
 
-            {a}
+            </button>
 
-          </button>
+          ))}
 
-        ))}
+        </div>
 
       </div>
 
     )
 
   }
+
+
+  // ---------------- RESULT ----------------
 
   if (screen === "result") {
 
@@ -290,23 +397,20 @@ export default function App() {
 
       <div style={styles.bg}>
 
-        <h2>Ответ отправлен</h2>
+        <div style={styles.card}>
 
-        <p>Он увидит результат позже</p>
+          <h2>Ответ отправлен</h2>
 
-        <button style={styles.button}
-          onClick={shareResult}>
+          <button
+            style={styles.btn}
+            onClick={() => setScreen("menu")}
+          >
 
-          🚀 Поделиться опросом
+            На главный экран
 
-        </button>
+          </button>
 
-        <button style={styles.menu}
-          onClick={() => setScreen("menu")}>
-
-          В меню
-
-        </button>
+        </div>
 
       </div>
 
@@ -314,36 +418,32 @@ export default function App() {
 
   }
 
+
+  // ---------------- INBOX ----------------
+
   if (screen === "inbox") {
 
     return (
 
       <div style={styles.bg}>
 
-        <h2>Ответы друзей</h2>
+        <div style={styles.card}>
 
-        {inbox.map((m, i) => (
+          <h2>Ответы друзей</h2>
 
-          <div key={i} style={styles.review}>
+          {inbox.map((m, i) => (
 
-            {m.text}
+            <div key={i} style={styles.msg}>
+              {m}
+            </div>
 
-            <button style={styles.unlock} onClick={buyAnswer}>
+          ))}
 
-              🔒 Узнать кто ответил — 3 голоса
+          <button style={styles.btn} onClick={() => setScreen("menu")}>
+            Назад
+          </button>
 
-            </button>
-
-          </div>
-
-        ))}
-
-        <button style={styles.menu}
-          onClick={() => setScreen("menu")}>
-
-          Назад
-
-        </button>
+        </div>
 
       </div>
 
@@ -353,93 +453,117 @@ export default function App() {
 
 }
 
+
+// ---------------- СТИЛИ ----------------
+
 const styles = {
 
   bg: {
     minHeight: "100vh",
-    background: "linear-gradient(135deg,#ff4d6d,#7b2ff7)",
+    background: "linear-gradient(160deg,#7a3cff,#a05cff,#ff7aa2)",
     display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
     justifyContent: "center",
-    color: "white",
-    fontFamily: "Inter,Arial",
-    padding: "20px"
+    alignItems: "center",
+    fontFamily: "Arial"
+  },
+
+  container: {
+    width: "360px",
+    textAlign: "center",
+    color: "white"
   },
 
   title: {
-    fontSize: "40px",
-    fontWeight: "700",
-    marginBottom: "25px",
-    textAlign: "center"
+    fontSize: "32px",
+    marginBottom: "10px"
   },
 
-  button: {
-    padding: "16px 40px",
-    margin: "10px",
-    fontSize: "18px",
-    borderRadius: "30px",
+  subtitle: {
+    marginBottom: "20px"
+  },
+
+  btn: {
+    width: "100%",
+    padding: "18px",
+    marginTop: "14px",
+    borderRadius: "40px",
     border: "none",
-    background: "linear-gradient(90deg,#ff8a00,#ff2d55)",
-    color: "white",
+    fontSize: "18px",
     cursor: "pointer",
-    boxShadow: "0 8px 20px rgba(0,0,0,0.3)"
+    background: "linear-gradient(90deg,#ff9a9e,#ff4ecd,#7a5cff)",
+    color: "white"
   },
 
   search: {
+    width: "100%",
     padding: "10px",
+    marginTop: "10px",
     borderRadius: "10px",
+    border: "none"
+  },
+
+  box: {
+    marginTop: "20px",
+    background: "rgba(255,255,255,0.2)",
+    padding: "15px",
+    borderRadius: "18px"
+  },
+
+  msg: {
+    background: "white",
+    color: "#222",
+    padding: "10px",
+    borderRadius: "12px",
+    marginTop: "10px"
+  },
+
+  lock: {
+    width: "100%",
+    padding: "14px",
+    marginTop: "12px",
+    borderRadius: "20px",
     border: "none",
-    marginBottom: "15px",
-    width: "240px"
+    background: "linear-gradient(90deg,#ff8a9a,#8b5cff)",
+    color: "white",
+    cursor: "pointer"
+  },
+
+  card: {
+    width: "340px",
+    background: "rgba(255,255,255,0.2)",
+    backdropFilter: "blur(15px)",
+    padding: "20px",
+    borderRadius: "20px",
+    color: "white"
   },
 
   friend: {
     display: "flex",
     alignItems: "center",
-    gap: "14px",
+    gap: "10px",
+    padding: "10px",
     background: "white",
     color: "#111",
-    padding: "12px",
-    borderRadius: "16px",
-    width: "260px",
-    margin: "8px",
-    cursor: "pointer",
-    boxShadow: "0 6px 16px rgba(0,0,0,0.2)"
+    borderRadius: "10px",
+    marginTop: "8px",
+    cursor: "pointer"
   },
 
   avatar: {
-    width: "50px",
-    height: "50px",
+    width: "40px",
+    height: "40px",
     borderRadius: "50%"
   },
 
-  menu: {
-    marginTop: "20px",
-    padding: "12px 26px",
-    borderRadius: "20px",
-    border: "none",
-    background: "#111",
-    color: "white"
-  },
-
-  review: {
-    background: "white",
-    color: "black",
+  answer: {
+    width: "100%",
     padding: "14px",
-    borderRadius: "14px",
-    margin: "8px",
-    width: "260px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.2)"
-  },
-
-  unlock: {
     marginTop: "10px",
-    padding: "8px 12px",
     border: "none",
-    borderRadius: "8px",
-    background: "#ff2d55",
-    color: "white"
+    borderRadius: "12px",
+    background: "linear-gradient(90deg,#ff8a9a,#ff3cac,#8b5cff)",
+    color: "white",
+    cursor: "pointer"
   }
 
 }
