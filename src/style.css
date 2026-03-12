@@ -1,0 +1,156 @@
+body {
+    margin: 0;
+    font-family: Arial;
+}
+
+.bg {
+
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background:
+        linear-gradient(120deg, #ff6ec4, #7873f5, #4facfe);
+
+    background-size: 400% 400%;
+    animation: gradient 12s ease infinite;
+
+}
+
+@keyframes gradient {
+
+    0% {
+        background-position: 0% 50%
+    }
+
+    50% {
+        background-position: 100% 50%
+    }
+
+    100% {
+        background-position: 0% 50%
+    }
+
+}
+
+.container {
+
+    width: 380px;
+    text-align: center;
+    color: white;
+
+}
+
+.title {
+
+    font-size: 38px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    text-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+
+}
+
+.subtitle {
+
+    font-size: 18px;
+    margin-bottom: 30px;
+    opacity: 0.9;
+
+}
+
+.mainBtn {
+
+    width: 100%;
+    padding: 20px;
+    margin-top: 16px;
+
+    border-radius: 60px;
+    border: none;
+
+    font-size: 20px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    color: white;
+
+    background:
+        linear-gradient(180deg, #ff8bdc, #ff4fb2, #7c6cff);
+
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+
+    transition: 0.2s;
+
+}
+
+.mainBtn:hover {
+
+    transform: scale(1.05);
+
+}
+
+.box {
+
+    margin-top: 35px;
+
+    background: rgba(255, 255, 255, 0.2);
+
+    padding: 22px;
+
+    border-radius: 28px;
+
+    backdrop-filter: blur(20px);
+
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+
+}
+
+.boxTitle {
+
+    font-weight: 700;
+    margin-bottom: 15px;
+
+}
+
+.msg {
+
+    background: white;
+
+    color: #333;
+
+    padding: 14px;
+
+    border-radius: 16px;
+
+    margin-top: 12px;
+
+    font-weight: 600;
+
+}
+
+.lockBtn {
+
+    width: 100%;
+
+    padding: 18px;
+
+    margin-top: 18px;
+
+    border-radius: 40px;
+
+    border: none;
+
+    font-weight: 700;
+
+    color: white;
+
+    cursor: pointer;
+
+    background:
+        linear-gradient(90deg, #ff8bdc, #ff4fb2, #7c6cff);
+
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+
+}
