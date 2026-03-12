@@ -136,22 +136,9 @@ export default function App() {
         background_color_top: "#6a3cff",
         background_color_bottom: "#ff4ecd",
 
-        sticker: {
-          sticker_type: "renderable",
-          renderable_sticker: {
-            content_type: "text",
-            text: "🔥 Тайное мнение друзей\nУзнай что думают о тебе",
-            style: {
-              bold: true,
-              color: "#ffffff",
-              size: 28
-            }
-          }
-        },
-
         attachment: {
           type: "url",
-          url: `https://vk.com/appXXXX#${user?.id}`,
+          url: `https://vk.com/appXXXX`,
           text: "to_store"
         }
 
@@ -159,6 +146,7 @@ export default function App() {
 
     } catch (e) {
 
+      console.log(e)
       alert("Ошибка сторис")
 
     }
@@ -401,132 +389,17 @@ export default function App() {
 }
 
 const styles = {
-
-  bg: {
-    minHeight: "100vh",
-    background: "linear-gradient(160deg,#6a3cff,#9b4dff,#ff6aa6)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    fontFamily: "Inter, Arial",
-    padding: "20px"
-  },
-
-  container: {
-    width: "360px",
-    textAlign: "center",
-    color: "white"
-  },
-
-  title: {
-    fontSize: "34px",
-    fontWeight: "700",
-    marginBottom: "8px",
-    textShadow: "0 5px 20px rgba(0,0,0,0.25)"
-  },
-
-  subtitle: {
-    opacity: 0.9,
-    marginBottom: "25px",
-    fontSize: "16px"
-  },
-
-  btn: {
-    width: "100%",
-    padding: "18px",
-    marginTop: "14px",
-    borderRadius: "50px",
-    border: "none",
-    fontSize: "18px",
-    cursor: "pointer",
-    background: "linear-gradient(90deg,#ff7aa2,#ff4ecd,#7a5cff)",
-    color: "white",
-    fontWeight: "600",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.25)"
-  },
-
-  search: {
-    width: "100%",
-    padding: "12px",
-    marginTop: "10px",
-    borderRadius: "14px",
-    border: "none",
-    fontSize: "15px"
-  },
-
-  box: {
-    marginTop: "25px",
-    background: "rgba(255,255,255,0.15)",
-    padding: "18px",
-    borderRadius: "22px",
-    backdropFilter: "blur(15px)",
-    boxShadow: "0 8px 30px rgba(0,0,0,0.2)"
-  },
-
-  msg: {
-    background: "white",
-    color: "#222",
-    padding: "12px",
-    borderRadius: "14px",
-    marginTop: "10px",
-    fontWeight: "500"
-  },
-
-  lock: {
-    width: "100%",
-    padding: "16px",
-    marginTop: "14px",
-    borderRadius: "40px",
-    border: "none",
-    background: "linear-gradient(90deg,#ff9a9e,#ff4ecd,#7a5cff)",
-    color: "white",
-    cursor: "pointer",
-    fontSize: "16px",
-    fontWeight: "600",
-    boxShadow: "0 8px 25px rgba(0,0,0,0.25)"
-  },
-
-  card: {
-    width: "340px",
-    background: "rgba(255,255,255,0.15)",
-    backdropFilter: "blur(20px)",
-    padding: "22px",
-    borderRadius: "24px",
-    color: "white",
-    boxShadow: "0 8px 35px rgba(0,0,0,0.3)"
-  },
-
-  friend: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    padding: "12px",
-    background: "white",
-    color: "#111",
-    borderRadius: "14px",
-    marginTop: "8px",
-    cursor: "pointer",
-    fontWeight: "500"
-  },
-
-  avatar: {
-    width: "42px",
-    height: "42px",
-    borderRadius: "50%"
-  },
-
-  answer: {
-    width: "100%",
-    padding: "16px",
-    marginTop: "12px",
-    border: "none",
-    borderRadius: "16px",
-    background: "linear-gradient(90deg,#ff8a9a,#ff3cac,#8b5cff)",
-    color: "white",
-    cursor: "pointer",
-    fontSize: "16px",
-    fontWeight: "600",
-    boxShadow: "0 6px 20px rgba(0,0,0,0.25)"
-  }
-
+  bg: { minHeight: "100vh", background: "linear-gradient(160deg,#6a3cff,#9b4dff,#ff6aa6)", display: "flex", justifyContent: "center", alignItems: "center", fontFamily: "Inter, Arial", padding: "20px" },
+  container: { width: "360px", textAlign: "center", color: "white" },
+  title: { fontSize: "34px", fontWeight: "700", marginBottom: "8px", textShadow: "0 5px 20px rgba(0,0,0,0.25)" },
+  subtitle: { opacity: 0.9, marginBottom: "25px", fontSize: "16px" },
+  btn: { width: "100%", padding: "18px", marginTop: "14px", borderRadius: "50px", border: "none", fontSize: "18px", cursor: "pointer", background: "linear-gradient(90deg,#ff7aa2,#ff4ecd,#7a5cff)", color: "white", fontWeight: "600", boxShadow: "0 10px 30px rgba(0,0,0,0.25)" },
+  search: { width: "100%", padding: "12px", marginTop: "10px", borderRadius: "14px", border: "none", fontSize: "15px" },
+  box: { marginTop: "25px", background: "rgba(255,255,255,0.15)", padding: "18px", borderRadius: "22px", backdropFilter: "blur(15px)", boxShadow: "0 8px 30px rgba(0,0,0,0.2)" },
+  msg: { background: "white", color: "#222", padding: "12px", borderRadius: "14px", marginTop: "10px", fontWeight: "500" },
+  lock: { width: "100%", padding: "16px", marginTop: "14px", borderRadius: "40px", border: "none", background: "linear-gradient(90deg,#ff9a9e,#ff4ecd,#7a5cff)", color: "white", cursor: "pointer", fontSize: "16px", fontWeight: "600", boxShadow: "0 8px 25px rgba(0,0,0,0.25)" },
+  card: { width: "340px", background: "rgba(255,255,255,0.15)", backdropFilter: "blur(20px)", padding: "22px", borderRadius: "24px", color: "white", boxShadow: "0 8px 35px rgba(0,0,0,0.3)" },
+  friend: { display: "flex", alignItems: "center", gap: "12px", padding: "12px", background: "white", color: "#111", borderRadius: "14px", marginTop: "8px", cursor: "pointer", fontWeight: "500" },
+  avatar: { width: "42px", height: "42px", borderRadius: "50%" },
+  answer: { width: "100%", padding: "16px", marginTop: "12px", border: "none", borderRadius: "16px", background: "linear-gradient(90deg,#ff8a9a,#ff3cac,#8b5cff)", color: "white", cursor: "pointer", fontSize: "16px", fontWeight: "600", boxShadow: "0 6px 20px rgba(0,0,0,0.25)" }
 }
