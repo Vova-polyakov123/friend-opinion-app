@@ -18,7 +18,7 @@ export default function App() {
   const [inbox, setInbox] = useState([])
 
 
-  // ---------------- INIT ----------------
+  // INIT
 
   useEffect(() => {
 
@@ -45,34 +45,25 @@ export default function App() {
   }, [])
 
 
-  // ---------------- ВОПРОСЫ ----------------
+  // ВОПРОСЫ
 
-  const baseQuestions = [
-    "Этот человек тайно в кого-то влюблён?",
-    "Он нравится противоположному полу?",
-    "Можно ли ему доверять?",
-    "Он хороший друг?",
-    "Этот человек популярный?",
-    "Он может предать?",
-    "Он добрый?",
-    "Он скрывает секрет?",
-    "Он весёлый?",
-    "Он кому-то сильно нравится?"
+  const questions = [
+
+    { q: "Этот человек тайно в кого-то влюблён?", a: ["Да", "Нет", "Возможно", "100%"] },
+    { q: "Он нравится противоположному полу?", a: ["Да", "Нет", "Возможно", "100%"] },
+    { q: "Можно ли ему доверять?", a: ["Да", "Нет", "Возможно", "100%"] },
+    { q: "Он хороший друг?", a: ["Да", "Нет", "Возможно", "100%"] },
+    { q: "Этот человек популярный?", a: ["Да", "Нет", "Возможно", "100%"] },
+    { q: "Он может предать?", a: ["Да", "Нет", "Возможно", "100%"] },
+    { q: "Он добрый?", a: ["Да", "Нет", "Возможно", "100%"] },
+    { q: "Он скрывает секрет?", a: ["Да", "Нет", "Возможно", "100%"] },
+    { q: "Он весёлый?", a: ["Да", "Нет", "Возможно", "100%"] },
+    { q: "Он кому-то сильно нравится?", a: ["Да", "Нет", "Возможно", "100%"] }
+
   ]
 
-  const questions = []
 
-  for (let i = 0; i < 600; i++) {
-
-    questions.push({
-      q: baseQuestions[i % baseQuestions.length],
-      a: ["Да", "Нет", "Возможно", "100%"]
-    })
-
-  }
-
-
-  // ---------------- ДРУЗЬЯ ----------------
+  // ДРУЗЬЯ
 
   async function requestFriends() {
 
@@ -101,7 +92,7 @@ export default function App() {
   }
 
 
-  // ---------------- ПОИСК ----------------
+  // ПОИСК
 
   const filteredFriends = friends.filter(f =>
 
@@ -112,7 +103,7 @@ export default function App() {
   )
 
 
-  // ---------------- QUIZ ----------------
+  // СТАРТ ОПРОСА
 
   function startQuiz(friend) {
 
@@ -124,19 +115,20 @@ export default function App() {
 
   }
 
+
+  // ОТВЕТ
+
   function answerClick(a) {
 
-    const newAnswers = [...answers, a]
+    setAnswers(prev => [...prev, a])
 
-    setAnswers(newAnswers)
+    if (qIndex < questions.length - 1) {
 
-    if (qIndex + 1 < questions.length) {
-
-      setQIndex(qIndex + 1)
+      setQIndex(prev => prev + 1)
 
     } else {
 
-      setInbox([...inbox, "💌 Кто-то ответил про тебя"])
+      setInbox(prev => [...prev, "💌 Кто-то ответил про тебя"])
 
       setScreen("result")
 
@@ -145,7 +137,7 @@ export default function App() {
   }
 
 
-  // ---------------- ПОКУПКА ----------------
+  // ПОКУПКА
 
   async function buyVoices() {
 
@@ -167,7 +159,7 @@ export default function App() {
   }
 
 
-  // ---------------- СТОРИС ----------------
+  // СТОРИС
 
   async function shareStory() {
 
@@ -195,7 +187,7 @@ export default function App() {
   }
 
 
-  // ---------------- MENU ----------------
+  // MENU
 
   if (screen === "menu") {
 
@@ -205,13 +197,9 @@ export default function App() {
 
         <div style={styles.container}>
 
-          <h1 style={styles.title}>
-            🔥 Тайное мнение друзей
-          </h1>
+          <h1 style={styles.title}>🔥 Тайное мнение друзей</h1>
 
-          <p style={styles.subtitle}>
-            Узнай что друзья думают о тебе
-          </p>
+          <p style={styles.subtitle}>Узнай что друзья думают о тебе</p>
 
           <button style={styles.btn} onClick={() => setScreen("intro")}>
             👥 Начать
@@ -252,7 +240,7 @@ export default function App() {
   }
 
 
-  // ---------------- INTRO ----------------
+  // INTRO
 
   if (screen === "intro") {
 
@@ -265,10 +253,8 @@ export default function App() {
           <h2>Как это работает</h2>
 
           <p>
-
             Ты выбираешь друга и отвечаешь на вопросы.
             Ответы отправляются анонимно.
-
           </p>
 
           <button style={styles.btn} onClick={requestFriends}>
@@ -288,7 +274,7 @@ export default function App() {
   }
 
 
-  // ---------------- FRIENDS ----------------
+  // FRIENDS
 
   if (screen === "friends") {
 
@@ -329,7 +315,10 @@ export default function App() {
               onClick={() => startQuiz(f)}
             >
 
-              <img src={f.photo_100} style={styles.avatar} />
+              <img
+                src={f.photo_100 || "https://vk.com/images/camera_200.png"}
+                style={styles.avatar}
+              />
 
               {f.first_name}
 
@@ -350,9 +339,9 @@ export default function App() {
   }
 
 
-  // ---------------- QUIZ ----------------
+  // QUIZ
 
-  if (screen === "quiz") {
+  if (screen === "quiz" && selectedFriend) {
 
     const q = questions[qIndex]
 
@@ -389,7 +378,7 @@ export default function App() {
   }
 
 
-  // ---------------- RESULT ----------------
+  // RESULT
 
   if (screen === "result") {
 
@@ -419,7 +408,7 @@ export default function App() {
   }
 
 
-  // ---------------- INBOX ----------------
+  // INBOX
 
   if (screen === "inbox") {
 
@@ -454,7 +443,7 @@ export default function App() {
 }
 
 
-// ---------------- СТИЛИ ----------------
+// СТИЛИ
 
 const styles = {
 
