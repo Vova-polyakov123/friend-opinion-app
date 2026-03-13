@@ -17,6 +17,9 @@ export default function App() {
 
   const [inbox, setInbox] = useState([])
 
+
+  // INIT
+
   useEffect(() => {
 
     async function init() {
@@ -24,11 +27,15 @@ export default function App() {
       try {
 
         await bridge.send("VKWebAppInit")
+
         const userInfo = await bridge.send("VKWebAppGetUserInfo")
+
         setUser(userInfo)
 
       } catch (e) {
+
         console.log(e)
+
       }
 
     }
@@ -36,6 +43,9 @@ export default function App() {
     init()
 
   }, [])
+
+
+  // ВОПРОСЫ
 
   const questions = [
 
@@ -52,26 +62,37 @@ export default function App() {
 
   ]
 
+
+  // ДРУЗЬЯ
+
   async function requestFriends() {
 
     try {
 
       const res = await bridge.send("VKWebAppGetFriends")
+
       const list = res.items || res.users || []
 
       setFriends(list)
+
       setFriendsError(false)
+
       setScreen("friends")
 
     } catch (e) {
 
       console.log(e)
+
       setFriendsError(true)
+
       alert("Нужно разрешить доступ к друзьям")
 
     }
 
   }
+
+
+  // ПОИСК
 
   const filteredFriends = friends.filter(f =>
 
@@ -81,14 +102,21 @@ export default function App() {
 
   )
 
+
+  // СТАРТ ОПРОСА
+
   function startQuiz(friend) {
 
     setSelectedFriend(friend)
     setQIndex(0)
     setAnswers([])
+
     setScreen("quiz")
 
   }
+
+
+  // ОТВЕТ
 
   function answerClick(a) {
 
@@ -101,11 +129,15 @@ export default function App() {
     } else {
 
       setInbox(prev => [...prev, "💌 Кто-то ответил про тебя"])
+
       setScreen("result")
 
     }
 
   }
+
+
+  // ПОКУПКА
 
   async function buyVoices() {
 
@@ -125,6 +157,9 @@ export default function App() {
     }
 
   }
+
+
+  // СТОРИС
 
   async function shareStory() {
 
@@ -151,6 +186,9 @@ export default function App() {
 
   }
 
+
+  // MENU
+
   if (screen === "menu") {
 
     return (
@@ -161,9 +199,7 @@ export default function App() {
 
           <h1 style={styles.title}>🔥 Тайное мнение друзей</h1>
 
-          <p style={styles.subtitle}>
-            Узнай что друзья думают о тебе
-          </p>
+          <p style={styles.subtitle}>Узнай что друзья думают о тебе</p>
 
           <button style={styles.btn} onClick={() => setScreen("intro")}>
             👥 Начать
@@ -203,6 +239,9 @@ export default function App() {
 
   }
 
+
+  // INTRO
+
   if (screen === "intro") {
 
     return (
@@ -233,6 +272,9 @@ export default function App() {
     )
 
   }
+
+
+  // FRIENDS
 
   if (screen === "friends") {
 
@@ -296,6 +338,9 @@ export default function App() {
 
   }
 
+
+  // QUIZ
+
   if (screen === "quiz" && selectedFriend) {
 
     const q = questions[qIndex]
@@ -332,6 +377,9 @@ export default function App() {
 
   }
 
+
+  // RESULT
+
   if (screen === "result") {
 
     return (
@@ -342,8 +390,13 @@ export default function App() {
 
           <h2>Ответ отправлен</h2>
 
-          <button style={styles.btn} onClick={() => setScreen("menu")}>
+          <button
+            style={styles.btn}
+            onClick={() => setScreen("menu")}
+          >
+
             На главный экран
+
           </button>
 
         </div>
@@ -353,6 +406,9 @@ export default function App() {
     )
 
   }
+
+
+  // INBOX
 
   if (screen === "inbox") {
 
@@ -386,16 +442,18 @@ export default function App() {
 
 }
 
+
+// СТИЛИ
+
 const styles = {
 
   bg: {
     minHeight: "100vh",
-    background: "linear-gradient(160deg,#6a3cff,#9b4dff,#ff6aa6)",
+    background: "linear-gradient(160deg,#7a3cff,#a05cff,#ff7aa2)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    fontFamily: "Inter, Arial",
-    padding: "20px"
+    fontFamily: "Arial"
   },
 
   container: {
@@ -405,114 +463,96 @@ const styles = {
   },
 
   title: {
-    fontSize: "34px",
-    fontWeight: "700",
-    marginBottom: "8px",
-    textShadow: "0 5px 20px rgba(0,0,0,0.25)"
+    fontSize: "32px",
+    marginBottom: "10px"
   },
 
   subtitle: {
-    opacity: 0.9,
-    marginBottom: "25px",
-    fontSize: "16px"
+    marginBottom: "20px"
   },
 
   btn: {
     width: "100%",
     padding: "18px",
     marginTop: "14px",
-    borderRadius: "50px",
+    borderRadius: "40px",
     border: "none",
     fontSize: "18px",
     cursor: "pointer",
-    background: "linear-gradient(90deg,#ff7aa2,#ff4ecd,#7a5cff)",
-    color: "white",
-    fontWeight: "600",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.25)"
+    background: "linear-gradient(90deg,#ff9a9e,#ff4ecd,#7a5cff)",
+    color: "white"
   },
 
   search: {
     width: "100%",
-    padding: "12px",
+    padding: "10px",
     marginTop: "10px",
-    borderRadius: "14px",
-    border: "none",
-    fontSize: "15px"
+    borderRadius: "10px",
+    border: "none"
   },
 
   box: {
-    marginTop: "25px",
-    background: "rgba(255,255,255,0.15)",
-    padding: "18px",
-    borderRadius: "22px",
-    backdropFilter: "blur(15px)",
-    boxShadow: "0 8px 30px rgba(0,0,0,0.2)"
+    marginTop: "20px",
+    background: "rgba(255,255,255,0.2)",
+    padding: "15px",
+    borderRadius: "18px"
   },
 
   msg: {
     background: "white",
     color: "#222",
-    padding: "12px",
-    borderRadius: "14px",
-    marginTop: "10px",
-    fontWeight: "500"
+    padding: "10px",
+    borderRadius: "12px",
+    marginTop: "10px"
   },
 
   lock: {
     width: "100%",
-    padding: "16px",
-    marginTop: "14px",
-    borderRadius: "40px",
+    padding: "14px",
+    marginTop: "12px",
+    borderRadius: "20px",
     border: "none",
-    background: "linear-gradient(90deg,#ff9a9e,#ff4ecd,#7a5cff)",
+    background: "linear-gradient(90deg,#ff8a9a,#8b5cff)",
     color: "white",
-    cursor: "pointer",
-    fontSize: "16px",
-    fontWeight: "600",
-    boxShadow: "0 8px 25px rgba(0,0,0,0.25)"
+    cursor: "pointer"
   },
 
   card: {
     width: "340px",
-    background: "rgba(255,255,255,0.15)",
-    backdropFilter: "blur(20px)",
-    padding: "22px",
-    borderRadius: "24px",
-    color: "white",
-    boxShadow: "0 8px 35px rgba(0,0,0,0.3)"
+    background: "rgba(255,255,255,0.2)",
+    backdropFilter: "blur(15px)",
+    padding: "20px",
+    borderRadius: "20px",
+    color: "white"
   },
 
   friend: {
     display: "flex",
     alignItems: "center",
-    gap: "12px",
-    padding: "12px",
+    gap: "10px",
+    padding: "10px",
     background: "white",
     color: "#111",
-    borderRadius: "14px",
+    borderRadius: "10px",
     marginTop: "8px",
-    cursor: "pointer",
-    fontWeight: "500"
+    cursor: "pointer"
   },
 
   avatar: {
-    width: "42px",
-    height: "42px",
+    width: "40px",
+    height: "40px",
     borderRadius: "50%"
   },
 
   answer: {
     width: "100%",
-    padding: "16px",
-    marginTop: "12px",
+    padding: "14px",
+    marginTop: "10px",
     border: "none",
-    borderRadius: "16px",
+    borderRadius: "12px",
     background: "linear-gradient(90deg,#ff8a9a,#ff3cac,#8b5cff)",
     color: "white",
-    cursor: "pointer",
-    fontSize: "16px",
-    fontWeight: "600",
-    boxShadow: "0 6px 20px rgba(0,0,0,0.25)"
+    cursor: "pointer"
   }
 
 }
