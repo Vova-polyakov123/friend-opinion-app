@@ -115,16 +115,14 @@ export default function App() {
 
       await bridge.send("VKWebAppShowStoryBox", {
 
-        background_type: "gradient",
+        background_type: "image",
 
-        background_color: "#6a3cff",
-
-        background_bottom_color: "#ff6aa6",
+        url: "https://i.imgur.com/2w7sYhT.png",
 
         attachment: {
           type: "url",
           url: window.location.href,
-          text: "🔥 Пройди анонимный опрос обо мне"
+          text: "🔥 Узнай тайное мнение друзей"
         }
 
       })
@@ -133,7 +131,7 @@ export default function App() {
 
       console.log("Story error:", error)
 
-      alert("Сторис работает только внутри VK")
+      alert("Открой приложение внутри VK")
 
     }
 
@@ -151,15 +149,15 @@ export default function App() {
 
           <p style={styles.subtitle}>Узнай что друзья думают о тебе</p>
 
-          <button type="button" style={styles.btn} onClick={() => setScreen("intro")}>
+          <button style={styles.btn} onClick={() => setScreen("intro")}>
             👥 Начать
           </button>
 
-          <button type="button" style={styles.btn} onClick={() => setScreen("inbox")}>
+          <button style={styles.btn} onClick={() => setScreen("inbox")}>
             ✉ Мои ответы
           </button>
 
-          <button type="button" style={styles.btn} onClick={() => shareStory()}>
+          <button style={styles.btn} onClick={() => shareStory()}>
             📲 Поделиться в сторис
           </button>
 
