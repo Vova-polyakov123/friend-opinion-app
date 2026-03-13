@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from "react"
-import bridge from "@vkontakte/vk-bridge"
+import React, { useState, useEffect } from "react";
+import bridge from "@vkontakte/vk-bridge";
 
 export default function App() {
 
-  const [screen, setScreen] = useState("menu")
-  const [user, setUser] = useState(null)
+  const [screen, setScreen] = useState("menu");
+  const [user, setUser] = useState(null);
 
-  const [friends, setFriends] = useState([])
-  const [search, setSearch] = useState("")
-  const [friendsError, setFriendsError] = useState(false)
+  const [friends, setFriends] = useState([]);
+  const [search, setSearch] = useState("");
+  const [friendsError, setFriendsError] = useState(false);
 
-  const [selectedFriend, setSelectedFriend] = useState(null)
+  const [selectedFriend, setSelectedFriend] = useState(null);
 
-  const [qIndex, setQIndex] = useState(0)
-  const [answers, setAnswers] = useState([])
+  const [qIndex, setQIndex] = useState(0);
+  const [answers, setAnswers] = useState([]);
 
-  const [inbox, setInbox] = useState([])
+  const [inbox, setInbox] = useState([]);
 
   useEffect(() => {
 
@@ -23,22 +23,22 @@ export default function App() {
 
       try {
 
-        await bridge.send("VKWebAppInit")
+        await bridge.send("VKWebAppInit");
 
-        const userInfo = await bridge.send("VKWebAppGetUserInfo")
-        setUser(userInfo)
+        const userInfo = await bridge.send("VKWebAppGetUserInfo");
+        setUser(userInfo);
 
       } catch (e) {
 
-        console.log("Init error:", e)
+        console.log("Init error:", e);
 
       }
 
     }
 
-    init()
+    init();
 
-  }, [])
+  }, []);
 
   const questions = [
 
@@ -53,24 +53,25 @@ export default function App() {
     { q: "Он весёлый?", a: ["Да", "Нет", "Возможно", "100%"] },
     { q: "Он кому-то сильно нравится?", a: ["Да", "Нет", "Возможно", "100%"] }
 
-  ]
+  ];
 
   async function requestFriends() {
 
     try {
 
-      const res = await bridge.send("VKWebAppGetFriends")
+      const res = await bridge.send("VKWebAppGetFriends", {
+        fields: "photo_100"
+      });
 
-      const list = res.items || res.users || []
-
-      setFriends(list)
-      setFriendsError(false)
-      setScreen("friends")
+      const list = res.items || [];
+      setFriends(list);
+      setFriendsError(false);
+      setScreen("friends");
 
     } catch (e) {
 
-      console.log(e)
-      setFriendsError(true)
+      console.log("Friends error:", e);
+      setFriendsError(true);
 
     }
 
@@ -80,30 +81,30 @@ export default function App() {
     (f.first_name + " " + (f.last_name || ""))
       .toLowerCase()
       .includes(search.toLowerCase())
-  )
+  );
 
   function startQuiz(friend) {
 
-    setSelectedFriend(friend)
-    setQIndex(0)
-    setAnswers([])
+    setSelectedFriend(friend);
+    setQIndex(0);
+    setAnswers([]);
 
-    setScreen("quiz")
+    setScreen("quiz");
 
   }
 
   function answerClick(a) {
 
-    setAnswers(prev => [...prev, a])
+    setAnswers(prev => [...prev, a]);
 
     if (qIndex < questions.length - 1) {
 
-      setQIndex(prev => prev + 1)
+      setQIndex(prev => prev + 1);
 
     } else {
 
-      setInbox(prev => [...prev, "💌 Кто-то ответил про тебя"])
-      setScreen("result")
+      setInbox(prev => [...prev, "💌 Кто-то ответил про тебя"]);
+      setScreen("result");
 
     }
 
@@ -111,7 +112,7 @@ export default function App() {
 
   function buyVoices() {
 
-    alert("Монетизация голосами настраивается в кабинете VK")
+    alert("Монетизация голосами настраивается в кабинете VK");
 
   }
 
@@ -119,13 +120,11 @@ export default function App() {
 
     try {
 
-      const platform = await bridge.send("VKWebAppGetPlatform")
+      const platform = await bridge.send("VKWebAppGetPlatform");
 
       if (platform === "web") {
-
-        alert("Сторис работают только в мобильном приложении VK 📱")
-        return
-
+        alert("Сторис работают только в мобильном приложении VK 📱");
+        return;
       }
 
       await bridge.send("VKWebAppShowStoryBox", {
@@ -140,11 +139,11 @@ export default function App() {
           text: "Пройди анонимный опрос обо мне 🔥"
         }
 
-      })
+      });
 
     } catch (e) {
 
-      console.log("Story error:", e)
+      console.log("Story error:", e);
 
     }
 
@@ -198,7 +197,7 @@ export default function App() {
 
       </div>
 
-    )
+    );
 
   }
 
@@ -229,7 +228,7 @@ export default function App() {
 
       </div>
 
-    )
+    );
 
   }
 
@@ -292,13 +291,13 @@ export default function App() {
 
       </div>
 
-    )
+    );
 
   }
 
   if (screen === "quiz" && selectedFriend) {
 
-    const q = questions[qIndex]
+    const q = questions[qIndex];
 
     return (
 
@@ -328,7 +327,7 @@ export default function App() {
 
       </div>
 
-    )
+    );
 
   }
 
@@ -354,7 +353,7 @@ export default function App() {
 
       </div>
 
-    )
+    );
 
   }
 
@@ -386,14 +385,13 @@ export default function App() {
 
       </div>
 
-    )
+    );
 
   }
 
 }
 
 const styles = {
-
   bg: {
     minHeight: "100vh",
     background: "linear-gradient(160deg,#6a3cff,#9b4dff,#ff6aa6)",
@@ -403,25 +401,21 @@ const styles = {
     fontFamily: "Inter, Arial",
     padding: "20px"
   },
-
   container: {
     width: "360px",
     textAlign: "center",
     color: "white"
   },
-
   title: {
     fontSize: "34px",
     fontWeight: "700",
     marginBottom: "8px"
   },
-
   subtitle: {
     opacity: 0.9,
     marginBottom: "25px",
     fontSize: "16px"
   },
-
   btn: {
     width: "100%",
     padding: "18px",
@@ -434,7 +428,6 @@ const styles = {
     color: "white",
     fontWeight: "600"
   },
-
   search: {
     width: "100%",
     padding: "12px",
@@ -443,14 +436,12 @@ const styles = {
     border: "none",
     fontSize: "15px"
   },
-
   box: {
     marginTop: "25px",
     background: "rgba(255,255,255,0.15)",
     padding: "18px",
     borderRadius: "22px"
   },
-
   msg: {
     background: "white",
     color: "#222",
@@ -459,7 +450,6 @@ const styles = {
     marginTop: "10px",
     fontWeight: "500"
   },
-
   lock: {
     width: "100%",
     padding: "16px",
@@ -470,7 +460,6 @@ const styles = {
     color: "white",
     cursor: "pointer"
   },
-
   card: {
     width: "340px",
     background: "rgba(255,255,255,0.15)",
@@ -478,7 +467,6 @@ const styles = {
     borderRadius: "24px",
     color: "white"
   },
-
   friend: {
     display: "flex",
     alignItems: "center",
@@ -490,13 +478,11 @@ const styles = {
     marginTop: "8px",
     cursor: "pointer"
   },
-
   avatar: {
     width: "42px",
     height: "42px",
     borderRadius: "50%"
   },
-
   answer: {
     width: "100%",
     padding: "16px",
@@ -507,5 +493,4 @@ const styles = {
     color: "white",
     cursor: "pointer"
   }
-
-}
+};
