@@ -113,16 +113,17 @@ export default function App() {
 
     try {
 
+      if (!user) return
+
       await bridge.send("VKWebAppShowStoryBox", {
 
-        background_type: "gradient",
+        background_type: "image",
 
-        background_color: "#6a3cff",
-        background_bottom_color: "#ff6aa6",
+        url: "https://picsum.photos/1080/1920",
 
         attachment: {
           type: "url",
-          url: `https://vk.com/appXXXX#${user?.id}`,
+          url: `https://vk.com/appXXXX#${user.id}`,
           text: "Пройди анонимный опрос обо мне"
         }
 
