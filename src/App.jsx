@@ -17,6 +17,8 @@ export default function App() {
 
   const [inbox, setInbox] = useState([])
 
+  const APP_ID = 54474085 // <-- ВСТАВЬ СЮДА ID ПРИЛОЖЕНИЯ
+
 
   // INIT
 
@@ -45,6 +47,7 @@ export default function App() {
   }, [])
 
 
+
   // ВОПРОСЫ
 
   const questions = [
@@ -53,12 +56,7 @@ export default function App() {
     { q: "Он нравится противоположному полу?", a: ["Да", "Нет", "Возможно", "100%"] },
     { q: "Можно ли ему доверять?", a: ["Да", "Нет", "Возможно", "100%"] },
     { q: "Он хороший друг?", a: ["Да", "Нет", "Возможно", "100%"] },
-    { q: "Этот человек популярный?", a: ["Да", "Нет", "Возможно", "100%"] },
-    { q: "Он может предать?", a: ["Да", "Нет", "Возможно", "100%"] },
-    { q: "Он добрый?", a: ["Да", "Нет", "Возможно", "100%"] },
-    { q: "Он скрывает секрет?", a: ["Да", "Нет", "Возможно", "100%"] },
-    { q: "Он весёлый?", a: ["Да", "Нет", "Возможно", "100%"] },
-    { q: "Он кому-то сильно нравится?", a: ["Да", "Нет", "Возможно", "100%"] }
+    { q: "Этот человек популярный?", a: ["Да", "Нет", "Возможно", "100%"] }
 
   ]
 
@@ -85,14 +83,10 @@ export default function App() {
 
       setFriendsError(true)
 
-      alert("Нужно разрешить доступ к друзьям")
-
     }
 
   }
 
-
-  // ПОИСК
 
   const filteredFriends = friends.filter(f =>
 
@@ -103,12 +97,13 @@ export default function App() {
   )
 
 
-  // СТАРТ ОПРОСА
 
   function startQuiz(friend) {
 
     setSelectedFriend(friend)
+
     setQIndex(0)
+
     setAnswers([])
 
     setScreen("quiz")
@@ -116,7 +111,6 @@ export default function App() {
   }
 
 
-  // ОТВЕТ
 
   function answerClick(a) {
 
@@ -137,54 +131,45 @@ export default function App() {
   }
 
 
-  // ПОКУПКА
 
-  async function buyVoices() {
-
-    try {
-
-      await bridge.send("VKWebAppShowOrderBox", {
-        type: "item",
-        item: "answers3"
-      })
-
-      alert("Покупка завершена")
-
-    } catch (e) {
-
-      console.log(e)
-
-    }
-
-  }
-
-
-  // СТОРИС
+  // СТОРИС (ИСПРАВЛЕНО)
 
   async function shareStory() {
 
     try {
 
+      const img = await fetch("https://i.imgur.com/8Km9tLL.png")
+
+      const blob = await img.blob()
+
       await bridge.send("VKWebAppShowStoryBox", {
 
         background_type: "image",
-        url: "https://i.imgur.com/8Km9tLL.png",
+
+        blob: blob,
 
         attachment: {
+
           type: "url",
-          url: `https://vk.com/appXXXX#${user?.id}`,
-          text: "to_store"
+
+          url: `https://vk.com/app${APP_ID}#${user?.id}`,
+
+          text: "Оставь мне анонимное мнение 👀"
+
         }
 
       })
 
     } catch (e) {
 
+      console.log(e)
+
       alert("Ошибка сторис")
 
     }
 
   }
+
 
 
   // MENU
@@ -199,37 +184,17 @@ export default function App() {
 
           <h1 style={styles.title}>🔥 Тайное мнение друзей</h1>
 
-          <p style={styles.subtitle}>Узнай что друзья думают о тебе</p>
-
           <button style={styles.btn} onClick={() => setScreen("intro")}>
-            👥 Начать
+            Начать
           </button>
 
           <button style={styles.btn} onClick={() => setScreen("inbox")}>
-            ✉ Мои ответы
+            Мои ответы
           </button>
 
           <button style={styles.btn} onClick={shareStory}>
-            📲 Поделиться в сторис
+            Поделиться в сторис
           </button>
-
-          <div style={styles.box}>
-
-            <p>Пример сообщений</p>
-
-            <div style={styles.msg}>
-              ❤️ Кто-то тайно влюблён в тебя
-            </div>
-
-            <div style={styles.msg}>
-              🔥 Ты очень нравишься одному другу
-            </div>
-
-            <button style={styles.lock} onClick={buyVoices}>
-              🔒 Узнать кто ответил — 3 голоса
-            </button>
-
-          </div>
 
         </div>
 
@@ -240,7 +205,6 @@ export default function App() {
   }
 
 
-  // INTRO
 
   if (screen === "intro") {
 
@@ -252,17 +216,8 @@ export default function App() {
 
           <h2>Как это работает</h2>
 
-          <p>
-            Ты выбираешь друга и отвечаешь на вопросы.
-            Ответы отправляются анонимно.
-          </p>
-
           <button style={styles.btn} onClick={requestFriends}>
             Продолжить
-          </button>
-
-          <button style={styles.btn} onClick={() => setScreen("menu")}>
-            Назад
           </button>
 
         </div>
@@ -274,7 +229,6 @@ export default function App() {
   }
 
 
-  // FRIENDS
 
   if (screen === "friends") {
 
@@ -284,28 +238,12 @@ export default function App() {
 
         <div style={styles.card}>
 
-          <h2>Выбери друга</h2>
-
           <input
-            placeholder="Поиск друга"
+            placeholder="Поиск"
             style={styles.search}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-
-          {friendsError && (
-
-            <div>
-
-              <p>Нужно разрешить доступ к друзьям</p>
-
-              <button style={styles.btn} onClick={requestFriends}>
-                Разрешить доступ
-              </button>
-
-            </div>
-
-          )}
 
           {filteredFriends.map(f => (
 
@@ -316,7 +254,7 @@ export default function App() {
             >
 
               <img
-                src={f.photo_100 || "https://vk.com/images/camera_200.png"}
+                src={f.photo_100}
                 style={styles.avatar}
               />
 
@@ -325,10 +263,6 @@ export default function App() {
             </div>
 
           ))}
-
-          <button style={styles.btn} onClick={() => setScreen("menu")}>
-            Назад
-          </button>
 
         </div>
 
@@ -339,7 +273,6 @@ export default function App() {
   }
 
 
-  // QUIZ
 
   if (screen === "quiz" && selectedFriend) {
 
@@ -378,7 +311,6 @@ export default function App() {
   }
 
 
-  // RESULT
 
   if (screen === "result") {
 
@@ -390,13 +322,8 @@ export default function App() {
 
           <h2>Ответ отправлен</h2>
 
-          <button
-            style={styles.btn}
-            onClick={() => setScreen("menu")}
-          >
-
+          <button style={styles.btn} onClick={() => setScreen("menu")}>
             На главный экран
-
           </button>
 
         </div>
@@ -408,7 +335,6 @@ export default function App() {
   }
 
 
-  // INBOX
 
   if (screen === "inbox") {
 
@@ -418,8 +344,6 @@ export default function App() {
 
         <div style={styles.card}>
 
-          <h2>Ответы друзей</h2>
-
           {inbox.map((m, i) => (
 
             <div key={i} style={styles.msg}>
@@ -427,10 +351,6 @@ export default function App() {
             </div>
 
           ))}
-
-          <button style={styles.btn} onClick={() => setScreen("menu")}>
-            Назад
-          </button>
 
         </div>
 
@@ -443,7 +363,6 @@ export default function App() {
 }
 
 
-// СТИЛИ
 
 const styles = {
 
@@ -467,10 +386,6 @@ const styles = {
     marginBottom: "10px"
   },
 
-  subtitle: {
-    marginBottom: "20px"
-  },
-
   btn: {
     width: "100%",
     padding: "18px",
@@ -486,35 +401,8 @@ const styles = {
   search: {
     width: "100%",
     padding: "10px",
-    marginTop: "10px",
     borderRadius: "10px",
     border: "none"
-  },
-
-  box: {
-    marginTop: "20px",
-    background: "rgba(255,255,255,0.2)",
-    padding: "15px",
-    borderRadius: "18px"
-  },
-
-  msg: {
-    background: "white",
-    color: "#222",
-    padding: "10px",
-    borderRadius: "12px",
-    marginTop: "10px"
-  },
-
-  lock: {
-    width: "100%",
-    padding: "14px",
-    marginTop: "12px",
-    borderRadius: "20px",
-    border: "none",
-    background: "linear-gradient(90deg,#ff8a9a,#8b5cff)",
-    color: "white",
-    cursor: "pointer"
   },
 
   card: {
@@ -553,6 +441,14 @@ const styles = {
     background: "linear-gradient(90deg,#ff8a9a,#ff3cac,#8b5cff)",
     color: "white",
     cursor: "pointer"
+  },
+
+  msg: {
+    background: "white",
+    color: "#222",
+    padding: "10px",
+    borderRadius: "12px",
+    marginTop: "10px"
   }
 
 }
