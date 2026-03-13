@@ -60,17 +60,11 @@ export default function App() {
 
       const res = await bridge.send("VKWebAppGetFriends", { fields: "photo_100" })
 
-      const list = res.items || []
-
-      setFriends(list)
-
-      setFriendsError(false)
+      setFriends(res.items || [])
 
       setScreen("friends")
 
     } catch (e) {
-
-      console.log(e)
 
       setFriendsError(true)
 
@@ -143,7 +137,7 @@ export default function App() {
 
         attachment: {
           type: "url",
-          url: `https://vk.com/appXXXX#${user?.id}`
+          url: `https://vk.com/appXXXX`
         },
 
         link_text: "Ответить"
@@ -153,8 +147,6 @@ export default function App() {
     } catch (e) {
 
       console.log(e)
-
-      alert("Ошибка сторис")
 
     }
 
@@ -170,37 +162,21 @@ export default function App() {
 
           <h1 style={styles.title}>🔥 Тайное мнение друзей</h1>
 
-          <p style={styles.subtitle}>Узнай что друзья думают о тебе</p>
+          <p style={styles.subtitle}>
+            Узнай что друзья думают о тебе
+          </p>
 
           <button style={styles.btn} onClick={() => setScreen("intro")}>
-            👥 Начать
+            Начать
           </button>
 
           <button style={styles.btn} onClick={() => setScreen("inbox")}>
-            ✉ Мои ответы
+            Мои ответы
           </button>
 
           <button style={styles.btn} onClick={shareStory}>
-            📲 Поделиться в сторис
+            Поделиться в сторис
           </button>
-
-          <div style={styles.box}>
-
-            <p>Пример сообщений</p>
-
-            <div style={styles.msg}>
-              ❤️ Кто-то тайно влюблён в тебя
-            </div>
-
-            <div style={styles.msg}>
-              🔥 Ты очень нравишься одному другу
-            </div>
-
-            <button style={styles.lock} onClick={buyVoices}>
-              🔒 Узнать кто ответил — 3 голоса
-            </button>
-
-          </div>
 
         </div>
 
@@ -218,10 +194,10 @@ export default function App() {
 
         <div style={styles.card}>
 
-          <h2>Как это работает</h2>
+          <h2>Как работает приложение</h2>
 
           <p>
-            Ты выбираешь друга и отвечаешь на вопросы.
+            Выберите друга и ответьте на несколько вопросов.
             Ответы отправляются анонимно.
           </p>
 
@@ -281,7 +257,7 @@ export default function App() {
             >
 
               <img
-                src={f.photo_100 || "https://vk.com/images/camera_200.png"}
+                src={f.photo_100}
                 style={styles.avatar}
               />
 
@@ -350,7 +326,7 @@ export default function App() {
           <h2>Ответ отправлен</h2>
 
           <button style={styles.btn} onClick={() => setScreen("menu")}>
-            На главный экран
+            Главная
           </button>
 
         </div>
@@ -375,6 +351,9 @@ export default function App() {
 
             <div key={i} style={styles.msg}>
               {m}
+              <button style={styles.lock} onClick={buyVoices}>
+                Узнать кто ответил — 3 голоса
+              </button>
             </div>
 
           ))}
@@ -397,12 +376,11 @@ const styles = {
 
   bg: {
     minHeight: "100vh",
-    background: "linear-gradient(160deg,#6a3cff,#9b4dff,#ff6aa6)",
+    background: "linear-gradient(160deg,#6a3cff,#ff6aa6)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    fontFamily: "Inter, Arial",
-    padding: "20px"
+    fontFamily: "Arial"
   },
 
   container: {
@@ -411,99 +389,75 @@ const styles = {
     color: "white"
   },
 
-  title: {
-    fontSize: "34px",
-    fontWeight: "700"
-  },
-
-  subtitle: {
-    opacity: 0.9,
-    marginBottom: "20px"
+  card: {
+    width: "340px",
+    background: "rgba(255,255,255,0.15)",
+    padding: "20px",
+    borderRadius: "20px",
+    color: "white"
   },
 
   btn: {
     width: "100%",
-    padding: "18px",
-    marginTop: "14px",
-    borderRadius: "50px",
+    padding: "16px",
+    marginTop: "12px",
+    borderRadius: "40px",
     border: "none",
-    fontSize: "18px",
-    cursor: "pointer",
-    background: "linear-gradient(90deg,#ff7aa2,#ff4ecd,#7a5cff)",
+    background: "#ff4ecd",
     color: "white",
-    fontWeight: "600"
+    fontSize: "16px"
   },
 
   search: {
     width: "100%",
     padding: "12px",
     marginTop: "10px",
-    borderRadius: "14px",
+    borderRadius: "12px",
     border: "none"
   },
 
-  box: {
-    marginTop: "25px",
-    background: "rgba(255,255,255,0.15)",
-    padding: "18px",
-    borderRadius: "22px"
+  friend: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    background: "white",
+    padding: "10px",
+    borderRadius: "10px",
+    marginTop: "8px",
+    cursor: "pointer"
+  },
+
+  avatar: {
+    width: "40px",
+    height: "40px",
+    borderRadius: "50%"
+  },
+
+  answer: {
+    width: "100%",
+    padding: "14px",
+    marginTop: "10px",
+    border: "none",
+    borderRadius: "14px",
+    background: "#ff4ecd",
+    color: "white"
   },
 
   msg: {
     background: "white",
     color: "#222",
     padding: "12px",
-    borderRadius: "14px",
+    borderRadius: "12px",
     marginTop: "10px"
   },
 
   lock: {
-    width: "100%",
-    padding: "16px",
-    marginTop: "14px",
-    borderRadius: "40px",
+    marginTop: "10px",
+    padding: "10px",
     border: "none",
-    background: "linear-gradient(90deg,#ff9a9e,#ff4ecd,#7a5cff)",
+    borderRadius: "10px",
+    background: "#ff4ecd",
     color: "white"
-  },
-
-  card: {
-    width: "340px",
-    background: "rgba(255,255,255,0.15)",
-    backdropFilter: "blur(20px)",
-    padding: "22px",
-    borderRadius: "24px",
-    color: "white"
-  },
-
-  friend: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    padding: "12px",
-    background: "white",
-    color: "#111",
-    borderRadius: "14px",
-    marginTop: "8px",
-    cursor: "pointer"
-  },
-
-  avatar: {
-    width: "42px",
-    height: "42px",
-    borderRadius: "50%"
-  },
-
-  answer: {
-    width: "100%",
-    padding: "16px",
-    marginTop: "12px",
-    border: "none",
-    borderRadius: "16px",
-    background: "linear-gradient(90deg,#ff8a9a,#ff3cac,#8b5cff)",
-    color: "white",
-    cursor: "pointer",
-    fontSize: "16px"
   }
 
 }
