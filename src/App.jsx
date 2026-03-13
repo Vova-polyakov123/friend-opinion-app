@@ -109,7 +109,7 @@ export default function App() {
     alert("Функция покупки голосов подключается в настройках VK")
   }
 
-  /* ИСПРАВЛЕННЫЙ СТОРИС */
+  /* ИСПРАВЛЕНА ТОЛЬКО СТОРИС */
 
   async function shareStory() {
 
@@ -132,7 +132,6 @@ export default function App() {
     } catch (e) {
 
       console.log("Story error:", e)
-      alert("Открой приложение внутри VK")
 
     }
 
@@ -249,6 +248,7 @@ export default function App() {
               <img
                 src={f.photo_100 || "https://vk.com/images/camera_200.png"}
                 style={styles.avatar}
+                alt=""
               />
 
               {f.first_name}
@@ -364,84 +364,28 @@ export default function App() {
 }
 
 const styles = {
-
   bg: {
     minHeight: "100vh",
     background: "linear-gradient(160deg,#6a3cff,#9b4dff,#ff6aa6)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    fontFamily: "Inter, Arial",
     padding: "20px"
   },
-
-  container: {
-    width: "360px",
-    textAlign: "center",
-    color: "white"
-  },
-
-  title: {
-    fontSize: "34px",
-    fontWeight: "700",
-    marginBottom: "8px"
-  },
-
-  subtitle: {
-    opacity: 0.9,
-    marginBottom: "25px",
-    fontSize: "16px"
-  },
-
+  container: { width: "360px", textAlign: "center", color: "white" },
+  title: { fontSize: "34px", fontWeight: "700" },
+  subtitle: { marginBottom: "20px" },
   btn: {
     width: "100%",
     padding: "18px",
-    marginTop: "14px",
-    borderRadius: "50px",
+    marginTop: "12px",
+    borderRadius: "40px",
     border: "none",
     fontSize: "18px",
     cursor: "pointer",
     background: "linear-gradient(90deg,#ff7aa2,#ff4ecd,#7a5cff)",
-    color: "white",
-    fontWeight: "600"
+    color: "white"
   },
-
-  search: {
-    width: "100%",
-    padding: "12px",
-    marginTop: "10px",
-    borderRadius: "14px",
-    border: "none",
-    fontSize: "15px"
-  },
-
-  box: {
-    marginTop: "25px",
-    background: "rgba(255,255,255,0.15)",
-    padding: "18px",
-    borderRadius: "22px"
-  },
-
-  msg: {
-    background: "white",
-    color: "#222",
-    padding: "12px",
-    borderRadius: "14px",
-    marginTop: "10px",
-    fontWeight: "500"
-  },
-
-  lock: {
-    width: "100%",
-    padding: "16px",
-    marginTop: "14px",
-    borderRadius: "40px",
-    border: "none",
-    background: "linear-gradient(90deg,#ff9a9e,#ff4ecd,#7a5cff)",
-    color: "white",
-    cursor: "pointer"
-  },
-
   card: {
     width: "340px",
     background: "rgba(255,255,255,0.15)",
@@ -449,34 +393,11 @@ const styles = {
     borderRadius: "24px",
     color: "white"
   },
-
-  friend: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    padding: "12px",
-    background: "white",
-    color: "#111",
-    borderRadius: "14px",
-    marginTop: "8px",
-    cursor: "pointer"
-  },
-
-  avatar: {
-    width: "42px",
-    height: "42px",
-    borderRadius: "50%"
-  },
-
-  answer: {
-    width: "100%",
-    padding: "16px",
-    marginTop: "12px",
-    border: "none",
-    borderRadius: "16px",
-    background: "linear-gradient(90deg,#ff8a9a,#ff3cac,#8b5cff)",
-    color: "white",
-    cursor: "pointer"
-  }
-
+  search: { width: "100%", padding: "12px", borderRadius: "12px", border: "none", marginTop: "10px" },
+  friend: { display: "flex", alignItems: "center", gap: "10px", padding: "10px", background: "white", color: "#111", borderRadius: "12px", marginTop: "8px", cursor: "pointer" },
+  avatar: { width: "40px", height: "40px", borderRadius: "50%" },
+  answer: { width: "100%", padding: "14px", marginTop: "10px", borderRadius: "14px", border: "none", background: "#7a5cff", color: "white", cursor: "pointer" },
+  msg: { background: "white", color: "#222", padding: "10px", borderRadius: "12px", marginTop: "8px" },
+  box: { marginTop: "20px", background: "rgba(255,255,255,0.15)", padding: "15px", borderRadius: "20px" },
+  lock: { width: "100%", padding: "14px", marginTop: "12px", borderRadius: "40px", border: "none", background: "#ff6aa6", color: "white", cursor: "pointer" }
 }
