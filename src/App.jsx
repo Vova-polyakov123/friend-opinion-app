@@ -24,11 +24,14 @@ export default function App() {
       try {
 
         await bridge.send("VKWebAppInit")
+
         const userInfo = await bridge.send("VKWebAppGetUserInfo")
         setUser(userInfo)
 
       } catch (e) {
+
         console.log(e)
+
       }
 
     }
@@ -57,6 +60,7 @@ export default function App() {
     try {
 
       const res = await bridge.send("VKWebAppGetFriends")
+
       const list = res.items || res.users || []
 
       setFriends(list)
@@ -67,6 +71,7 @@ export default function App() {
 
       console.log(e)
       setFriendsError(true)
+
       alert("Нужно разрешить доступ к друзьям")
 
     }
@@ -84,6 +89,7 @@ export default function App() {
     setSelectedFriend(friend)
     setQIndex(0)
     setAnswers([])
+
     setScreen("quiz")
 
   }
@@ -99,6 +105,7 @@ export default function App() {
     } else {
 
       setInbox(prev => [...prev, "💌 Кто-то ответил про тебя"])
+
       setScreen("result")
 
     }
@@ -106,31 +113,40 @@ export default function App() {
   }
 
   function buyVoices() {
+
     alert("Функция покупки голосов подключается в настройках VK")
+
   }
 
   async function shareStory() {
 
     try {
 
+      if (!user) return
+
       await bridge.send("VKWebAppShowStoryBox", {
 
-        background_type: "gradient",
+        background_type: "image",
 
-        background_color: "#6a3cff",
-        background_bottom_color: "#ff6aa6",
+        url: "https://images.unsplash.com/photo-1557804506-669a67965ba0",
 
         attachment: {
+
           type: "url",
-          url: `https://vk.com/appXXXX#${user?.id}`,
+
+          url: `https://vk.com/appAPP_ID#${user.id}`,
+
           text: "Пройди анонимный опрос обо мне"
+
         }
 
       })
 
     } catch (e) {
 
-      console.log(e)
+      console.log("Story error:", e)
+
+      alert("Не удалось открыть сторис")
 
     }
 
@@ -261,6 +277,7 @@ export default function App() {
               <img
                 src={f.photo_100 || "https://vk.com/images/camera_200.png"}
                 style={styles.avatar}
+                alt=""
               />
 
               {f.first_name}
