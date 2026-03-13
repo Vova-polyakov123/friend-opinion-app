@@ -20,17 +20,16 @@ export default function App() {
   useEffect(() => {
 
     async function init() {
-
       try {
 
         await bridge.send("VKWebAppInit")
+
         const userInfo = await bridge.send("VKWebAppGetUserInfo")
         setUser(userInfo)
 
       } catch (e) {
         console.log(e)
       }
-
     }
 
     init()
@@ -57,7 +56,7 @@ export default function App() {
     try {
 
       const res = await bridge.send("VKWebAppGetFriends")
-      const list = res.items || res.users || []
+      const list = res.items || []
 
       setFriends(list)
       setFriendsError(false)
@@ -116,20 +115,18 @@ export default function App() {
       alert("Покупка завершена")
 
     } catch (e) {
-
       console.log(e)
-
     }
 
   }
 
-  // 🔥 ИСПРАВЛЕННЫЕ СТОРИС
+  // ⭐ ПОЛНОСТЬЮ ИСПРАВЛЕННЫЕ СТОРИС
   async function shareStory() {
 
     try {
 
-      const response = await fetch("https://i.imgur.com/8Km9tLL.png")
-      const blob = await response.blob()
+      const img = await fetch("https://i.imgur.com/8Km9tLL.png")
+      const blob = await img.blob()
 
       await bridge.send("VKWebAppShowStoryBox", {
 
@@ -139,7 +136,7 @@ export default function App() {
         attachment: {
           type: "url",
           url: "https://vk.com",
-          text: "Играй в Тайное мнение друзей"
+          text: "Попробуй приложение Тайное мнение друзей"
         }
 
       })
@@ -253,10 +250,6 @@ export default function App() {
             onChange={(e) => setSearch(e.target.value)}
           />
 
-          {friendsError && (
-            <p>Нужно разрешить доступ к друзьям</p>
-          )}
-
           {filteredFriends.map(f => (
 
             <div
@@ -266,7 +259,7 @@ export default function App() {
             >
 
               <img
-                src={f.photo_100 || "https://vk.com/images/camera_200.png"}
+                src={f.photo_100}
                 style={styles.avatar}
                 alt=""
               />
@@ -398,14 +391,12 @@ const styles = {
   title: {
     fontSize: "34px",
     fontWeight: "700",
-    marginBottom: "8px",
-    textShadow: "0 5px 20px rgba(0,0,0,0.25)"
+    marginBottom: "8px"
   },
 
   subtitle: {
     opacity: 0.9,
-    marginBottom: "25px",
-    fontSize: "16px"
+    marginBottom: "25px"
   },
 
   btn: {
@@ -417,9 +408,7 @@ const styles = {
     fontSize: "18px",
     cursor: "pointer",
     background: "linear-gradient(90deg,#ff7aa2,#ff4ecd,#7a5cff)",
-    color: "white",
-    fontWeight: "600",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.25)"
+    color: "white"
   },
 
   search: {
@@ -427,17 +416,14 @@ const styles = {
     padding: "12px",
     marginTop: "10px",
     borderRadius: "14px",
-    border: "none",
-    fontSize: "15px"
+    border: "none"
   },
 
   box: {
     marginTop: "25px",
     background: "rgba(255,255,255,0.15)",
     padding: "18px",
-    borderRadius: "22px",
-    backdropFilter: "blur(15px)",
-    boxShadow: "0 8px 30px rgba(0,0,0,0.2)"
+    borderRadius: "22px"
   },
 
   msg: {
@@ -445,8 +431,7 @@ const styles = {
     color: "#222",
     padding: "12px",
     borderRadius: "14px",
-    marginTop: "10px",
-    fontWeight: "500"
+    marginTop: "10px"
   },
 
   lock: {
@@ -457,20 +442,15 @@ const styles = {
     border: "none",
     background: "linear-gradient(90deg,#ff9a9e,#ff4ecd,#7a5cff)",
     color: "white",
-    cursor: "pointer",
-    fontSize: "16px",
-    fontWeight: "600",
-    boxShadow: "0 8px 25px rgba(0,0,0,0.25)"
+    cursor: "pointer"
   },
 
   card: {
     width: "340px",
     background: "rgba(255,255,255,0.15)",
-    backdropFilter: "blur(20px)",
     padding: "22px",
     borderRadius: "24px",
-    color: "white",
-    boxShadow: "0 8px 35px rgba(0,0,0,0.3)"
+    color: "white"
   },
 
   friend: {
@@ -482,8 +462,7 @@ const styles = {
     color: "#111",
     borderRadius: "14px",
     marginTop: "8px",
-    cursor: "pointer",
-    fontWeight: "500"
+    cursor: "pointer"
   },
 
   avatar: {
@@ -500,10 +479,7 @@ const styles = {
     borderRadius: "16px",
     background: "linear-gradient(90deg,#ff8a9a,#ff3cac,#8b5cff)",
     color: "white",
-    cursor: "pointer",
-    fontSize: "16px",
-    fontWeight: "600",
-    boxShadow: "0 6px 20px rgba(0,0,0,0.25)"
+    cursor: "pointer"
   }
 
 }
