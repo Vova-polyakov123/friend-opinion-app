@@ -113,25 +113,16 @@ export default function App() {
 
     try {
 
-      if (!user) return
-
       await bridge.send("VKWebAppShowStoryBox", {
-
-        background_type: "image",
-
-        url: "https://picsum.photos/1080/1920",
-
-        attachment: {
-          type: "url",
-          url: `https://vk.com/appXXXX#${user.id}`,
-          text: "Пройди анонимный опрос обо мне"
-        }
-
+        background_type: "gradient",
+        background_top_color: "#6a3cff",
+        background_bottom_color: "#ff6aa6",
+        stickers: []
       })
 
     } catch (e) {
 
-      console.log(e)
+      console.log("Story error:", e)
 
     }
 
