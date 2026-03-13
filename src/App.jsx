@@ -20,16 +20,17 @@ export default function App() {
   useEffect(() => {
 
     async function init() {
+
       try {
 
         await bridge.send("VKWebAppInit")
-
         const userInfo = await bridge.send("VKWebAppGetUserInfo")
         setUser(userInfo)
 
       } catch (e) {
         console.log(e)
       }
+
     }
 
     init()
@@ -56,7 +57,7 @@ export default function App() {
     try {
 
       const res = await bridge.send("VKWebAppGetFriends")
-      const list = res.items || []
+      const list = res.items || res.users || []
 
       setFriends(list)
       setFriendsError(false)
@@ -66,15 +67,18 @@ export default function App() {
 
       console.log(e)
       setFriendsError(true)
+      alert("Нужно разрешить доступ к друзьям")
 
     }
 
   }
 
   const filteredFriends = friends.filter(f =>
+
     (f.first_name + " " + (f.last_name || ""))
       .toLowerCase()
       .includes(search.toLowerCase())
+
   )
 
   function startQuiz(friend) {
@@ -115,35 +119,32 @@ export default function App() {
       alert("Покупка завершена")
 
     } catch (e) {
+
       console.log(e)
+
     }
 
   }
 
-  // ⭐ ПОЛНОСТЬЮ ИСПРАВЛЕННЫЕ СТОРИС
   async function shareStory() {
 
     try {
 
-      const img = await fetch("https://i.imgur.com/8Km9tLL.png")
-      const blob = await img.blob()
-
       await bridge.send("VKWebAppShowStoryBox", {
 
         background_type: "image",
-        blob: blob,
+        url: "https://i.imgur.com/8Km9tLL.png",
 
         attachment: {
           type: "url",
-          url: "https://vk.com",
-          text: "Попробуй приложение Тайное мнение друзей"
+          url: `https://vk.com/appXXXX#${user?.id}`,
+          text: "to_store"
         }
 
       })
 
     } catch (e) {
 
-      console.log(e)
       alert("Ошибка сторис")
 
     }
@@ -250,6 +251,20 @@ export default function App() {
             onChange={(e) => setSearch(e.target.value)}
           />
 
+          {friendsError && (
+
+            <div>
+
+              <p>Нужно разрешить доступ к друзьям</p>
+
+              <button style={styles.btn} onClick={requestFriends}>
+                Разрешить доступ
+              </button>
+
+            </div>
+
+          )}
+
           {filteredFriends.map(f => (
 
             <div
@@ -259,9 +274,8 @@ export default function App() {
             >
 
               <img
-                src={f.photo_100}
+                src={f.photo_100 || "https://vk.com/images/camera_200.png"}
                 style={styles.avatar}
-                alt=""
               />
 
               {f.first_name}
@@ -303,7 +317,9 @@ export default function App() {
               style={styles.answer}
               onClick={() => answerClick(a)}
             >
+
               {a}
+
             </button>
 
           ))}
@@ -391,12 +407,14 @@ const styles = {
   title: {
     fontSize: "34px",
     fontWeight: "700",
-    marginBottom: "8px"
+    marginBottom: "8px",
+    textShadow: "0 5px 20px rgba(0,0,0,0.25)"
   },
 
   subtitle: {
     opacity: 0.9,
-    marginBottom: "25px"
+    marginBottom: "25px",
+    fontSize: "16px"
   },
 
   btn: {
@@ -408,7 +426,9 @@ const styles = {
     fontSize: "18px",
     cursor: "pointer",
     background: "linear-gradient(90deg,#ff7aa2,#ff4ecd,#7a5cff)",
-    color: "white"
+    color: "white",
+    fontWeight: "600",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.25)"
   },
 
   search: {
@@ -416,14 +436,17 @@ const styles = {
     padding: "12px",
     marginTop: "10px",
     borderRadius: "14px",
-    border: "none"
+    border: "none",
+    fontSize: "15px"
   },
 
   box: {
     marginTop: "25px",
     background: "rgba(255,255,255,0.15)",
     padding: "18px",
-    borderRadius: "22px"
+    borderRadius: "22px",
+    backdropFilter: "blur(15px)",
+    boxShadow: "0 8px 30px rgba(0,0,0,0.2)"
   },
 
   msg: {
@@ -431,7 +454,8 @@ const styles = {
     color: "#222",
     padding: "12px",
     borderRadius: "14px",
-    marginTop: "10px"
+    marginTop: "10px",
+    fontWeight: "500"
   },
 
   lock: {
@@ -442,15 +466,20 @@ const styles = {
     border: "none",
     background: "linear-gradient(90deg,#ff9a9e,#ff4ecd,#7a5cff)",
     color: "white",
-    cursor: "pointer"
+    cursor: "pointer",
+    fontSize: "16px",
+    fontWeight: "600",
+    boxShadow: "0 8px 25px rgba(0,0,0,0.25)"
   },
 
   card: {
     width: "340px",
     background: "rgba(255,255,255,0.15)",
+    backdropFilter: "blur(20px)",
     padding: "22px",
     borderRadius: "24px",
-    color: "white"
+    color: "white",
+    boxShadow: "0 8px 35px rgba(0,0,0,0.3)"
   },
 
   friend: {
@@ -462,7 +491,8 @@ const styles = {
     color: "#111",
     borderRadius: "14px",
     marginTop: "8px",
-    cursor: "pointer"
+    cursor: "pointer",
+    fontWeight: "500"
   },
 
   avatar: {
@@ -479,7 +509,10 @@ const styles = {
     borderRadius: "16px",
     background: "linear-gradient(90deg,#ff8a9a,#ff3cac,#8b5cff)",
     color: "white",
-    cursor: "pointer"
+    cursor: "pointer",
+    fontSize: "16px",
+    fontWeight: "600",
+    boxShadow: "0 6px 20px rgba(0,0,0,0.25)"
   }
 
 }
