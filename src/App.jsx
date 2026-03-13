@@ -30,7 +30,7 @@ export default function App() {
 
       } catch (e) {
 
-        console.log(e)
+        console.log("Init error:", e)
 
       }
 
@@ -72,8 +72,6 @@ export default function App() {
       console.log(e)
       setFriendsError(true)
 
-      alert("Нужно разрешить доступ к друзьям")
-
     }
 
   }
@@ -105,7 +103,6 @@ export default function App() {
     } else {
 
       setInbox(prev => [...prev, "💌 Кто-то ответил про тебя"])
-
       setScreen("result")
 
     }
@@ -114,7 +111,7 @@ export default function App() {
 
   function buyVoices() {
 
-    alert("Функция покупки голосов подключается в настройках VK")
+    alert("Монетизация голосами настраивается в кабинете VK")
 
   }
 
@@ -122,22 +119,25 @@ export default function App() {
 
     try {
 
-      if (!user) return
+      const platform = await bridge.send("VKWebAppGetPlatform")
+
+      if (platform === "web") {
+
+        alert("Сторис работают только в мобильном приложении VK 📱")
+        return
+
+      }
 
       await bridge.send("VKWebAppShowStoryBox", {
 
         background_type: "image",
 
-        url: "https://images.unsplash.com/photo-1557804506-669a67965ba0",
+        url: "https://vk.com/images/camera_200.png",
 
         attachment: {
-
           type: "url",
-
-          url: `https://vk.com/appAPP_ID#${user.id}`,
-
-          text: "Пройди анонимный опрос обо мне"
-
+          url: "https://vk.com/app54474085",
+          text: "Пройди анонимный опрос обо мне 🔥"
         }
 
       })
@@ -145,8 +145,6 @@ export default function App() {
     } catch (e) {
 
       console.log("Story error:", e)
-
-      alert("Не удалось открыть сторис")
 
     }
 
@@ -342,7 +340,11 @@ export default function App() {
 
         <div style={styles.card}>
 
-          <h2>Ответ отправлен</h2>
+          <h2>Ответ отправлен ✅</h2>
+
+          <button style={styles.btn} onClick={shareStory}>
+            📲 Поделиться в сторис
+          </button>
 
           <button style={styles.btn} onClick={() => setScreen("menu")}>
             На главный экран
@@ -365,6 +367,8 @@ export default function App() {
         <div style={styles.card}>
 
           <h2>Ответы друзей</h2>
+
+          {inbox.length === 0 && <p>Пока нет ответов</p>}
 
           {inbox.map((m, i) => (
 
