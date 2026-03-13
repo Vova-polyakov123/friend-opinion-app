@@ -20,19 +20,16 @@ export default function App() {
   useEffect(() => {
 
     async function init() {
-
       try {
 
         await bridge.send("VKWebAppInit")
+
         const userInfo = await bridge.send("VKWebAppGetUserInfo")
         setUser(userInfo)
 
       } catch (e) {
-
         console.log(e)
-
       }
-
     }
 
     init()
@@ -62,9 +59,7 @@ export default function App() {
         fields: "photo_100"
       })
 
-      const list = res.items || []
-
-      setFriends(list)
+      setFriends(res.items || [])
       setScreen("friends")
 
     } catch (e) {
@@ -117,12 +112,12 @@ export default function App() {
 
         background_type: "image",
 
-        url: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac",
+        url: window.location.origin + "/story.png",
 
         attachment: {
           type: "url",
-          url: "https://vk.com",
-          text: "🔥 Пройди анонимный опрос обо мне"
+          url: window.location.href,
+          text: "🔥 Узнай что друзья думают о тебе"
         }
 
       })
@@ -343,6 +338,7 @@ export default function App() {
 
   }
 
+  return null
 }
 
 const styles = {
