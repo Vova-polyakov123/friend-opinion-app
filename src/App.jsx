@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import bridge from "@vkontakte/vk-bridge"
 
-const APP_ID = "12345678"
+const APP_ID = 54474085 // <-- ВСТАВЬ РЕАЛЬНЫЙ ID ПРИЛОЖЕНИЯ
 
 export default function App() {
 
@@ -26,11 +26,14 @@ export default function App() {
       try {
 
         await bridge.send("VKWebAppInit")
+
         const userInfo = await bridge.send("VKWebAppGetUserInfo")
         setUser(userInfo)
 
       } catch (e) {
+
         console.log(e)
+
       }
 
     }
@@ -45,12 +48,7 @@ export default function App() {
     { q: "Он нравится противоположному полу?", a: ["Да", "Нет", "Возможно", "100%"] },
     { q: "Можно ли ему доверять?", a: ["Да", "Нет", "Возможно", "100%"] },
     { q: "Он хороший друг?", a: ["Да", "Нет", "Возможно", "100%"] },
-    { q: "Этот человек популярный?", a: ["Да", "Нет", "Возможно", "100%"] },
-    { q: "Он может предать?", a: ["Да", "Нет", "Возможно", "100%"] },
-    { q: "Он добрый?", a: ["Да", "Нет", "Возможно", "100%"] },
-    { q: "Он скрывает секрет?", a: ["Да", "Нет", "Возможно", "100%"] },
-    { q: "Он весёлый?", a: ["Да", "Нет", "Возможно", "100%"] },
-    { q: "Он кому-то сильно нравится?", a: ["Да", "Нет", "Возможно", "100%"] }
+    { q: "Этот человек популярный?", a: ["Да", "Нет", "Возможно", "100%"] }
 
   ]
 
@@ -59,17 +57,15 @@ export default function App() {
     try {
 
       const res = await bridge.send("VKWebAppGetFriends")
-      const list = res.items || res.users || []
+      const list = res.items || []
 
       setFriends(list)
-      setFriendsError(false)
       setScreen("friends")
 
     } catch (e) {
 
       console.log(e)
       setFriendsError(true)
-      alert("Нужно разрешить доступ к друзьям")
 
     }
 
@@ -116,12 +112,9 @@ export default function App() {
         item: "answers3"
       })
 
-      alert("Покупка прошла успешно")
-
     } catch (e) {
 
       console.log(e)
-      alert("Покупка отменена")
 
     }
 
@@ -142,8 +135,7 @@ export default function App() {
 
         sticker: {
           sticker_type: "renderable",
-          text: "🔥 Тайное мнение друзей",
-          style: "white"
+          text: "🔥 Тайное мнение друзей"
         },
 
         attachment: {
@@ -173,10 +165,6 @@ export default function App() {
 
           <h1 style={styles.title}>🔥 Тайное мнение друзей</h1>
 
-          <p style={styles.subtitle}>
-            Узнай что друзья думают о тебе
-          </p>
-
           <button style={styles.btn} onClick={() => setScreen("intro")}>
             👥 Начать
           </button>
@@ -190,8 +178,6 @@ export default function App() {
           </button>
 
           <div style={styles.box}>
-
-            <p>Пример сообщений</p>
 
             <div style={styles.msg}>
               ❤️ Кто-то тайно влюблён в тебя
@@ -220,15 +206,9 @@ export default function App() {
     return (
 
       <div style={styles.bg}>
-
         <div style={styles.card}>
 
           <h2>Как это работает</h2>
-
-          <p>
-            Ты выбираешь друга и отвечаешь на вопросы.
-            Ответы отправляются анонимно.
-          </p>
 
           <button style={styles.btn} onClick={requestFriends}>
             Продолжить
@@ -239,7 +219,6 @@ export default function App() {
           </button>
 
         </div>
-
       </div>
 
     )
@@ -251,31 +230,16 @@ export default function App() {
     return (
 
       <div style={styles.bg}>
-
         <div style={styles.card}>
 
           <h2>Выбери друга</h2>
 
           <input
-            placeholder="Поиск друга"
+            placeholder="Поиск"
             style={styles.search}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-
-          {friendsError && (
-
-            <div>
-
-              <p>Нужно разрешить доступ к друзьям</p>
-
-              <button style={styles.btn} onClick={requestFriends}>
-                Разрешить доступ
-              </button>
-
-            </div>
-
-          )}
 
           {filteredFriends.map(f => (
 
@@ -286,7 +250,7 @@ export default function App() {
             >
 
               <img
-                src={f.photo_100 || "https://vk.com/images/camera_200.png"}
+                src={f.photo_100}
                 style={styles.avatar}
               />
 
@@ -296,12 +260,7 @@ export default function App() {
 
           ))}
 
-          <button style={styles.btn} onClick={() => setScreen("menu")}>
-            Назад
-          </button>
-
         </div>
-
       </div>
 
     )
@@ -315,7 +274,6 @@ export default function App() {
     return (
 
       <div style={styles.bg}>
-
         <div style={styles.card}>
 
           <h2>{selectedFriend.first_name}</h2>
@@ -337,7 +295,6 @@ export default function App() {
           ))}
 
         </div>
-
       </div>
 
     )
@@ -349,7 +306,6 @@ export default function App() {
     return (
 
       <div style={styles.bg}>
-
         <div style={styles.card}>
 
           <h2>Ответ отправлен</h2>
@@ -359,7 +315,6 @@ export default function App() {
           </button>
 
         </div>
-
       </div>
 
     )
@@ -371,7 +326,6 @@ export default function App() {
     return (
 
       <div style={styles.bg}>
-
         <div style={styles.card}>
 
           <h2>Ответы друзей</h2>
@@ -384,132 +338,27 @@ export default function App() {
 
           ))}
 
-          <button style={styles.btn} onClick={() => setScreen("menu")}>
-            Назад
-          </button>
-
         </div>
-
       </div>
 
     )
 
   }
 
+  return null
 }
 
 const styles = {
-
-  bg: {
-    minHeight: "100vh",
-    background: "linear-gradient(160deg,#6a3cff,#9b4dff,#ff6aa6)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    fontFamily: "Inter, Arial",
-    padding: "20px"
-  },
-
-  container: {
-    width: "360px",
-    textAlign: "center",
-    color: "white"
-  },
-
-  title: {
-    fontSize: "34px",
-    fontWeight: "700",
-    marginBottom: "8px"
-  },
-
-  subtitle: {
-    opacity: 0.9,
-    marginBottom: "25px"
-  },
-
-  btn: {
-    width: "100%",
-    padding: "18px",
-    marginTop: "14px",
-    borderRadius: "50px",
-    border: "none",
-    fontSize: "18px",
-    cursor: "pointer",
-    background: "linear-gradient(90deg,#ff7aa2,#ff4ecd,#7a5cff)",
-    color: "white",
-    fontWeight: "600"
-  },
-
-  search: {
-    width: "100%",
-    padding: "12px",
-    marginTop: "10px",
-    borderRadius: "14px",
-    border: "none"
-  },
-
-  box: {
-    marginTop: "25px",
-    background: "rgba(255,255,255,0.15)",
-    padding: "18px",
-    borderRadius: "22px"
-  },
-
-  msg: {
-    background: "white",
-    color: "#222",
-    padding: "12px",
-    borderRadius: "14px",
-    marginTop: "10px"
-  },
-
-  lock: {
-    width: "100%",
-    padding: "16px",
-    marginTop: "14px",
-    borderRadius: "40px",
-    border: "none",
-    background: "linear-gradient(90deg,#ff9a9e,#ff4ecd,#7a5cff)",
-    color: "white",
-    cursor: "pointer"
-  },
-
-  card: {
-    width: "340px",
-    background: "rgba(255,255,255,0.15)",
-    backdropFilter: "blur(20px)",
-    padding: "22px",
-    borderRadius: "24px",
-    color: "white"
-  },
-
-  friend: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    padding: "12px",
-    background: "white",
-    color: "#111",
-    borderRadius: "14px",
-    marginTop: "8px",
-    cursor: "pointer"
-  },
-
-  avatar: {
-    width: "42px",
-    height: "42px",
-    borderRadius: "50%"
-  },
-
-  answer: {
-    width: "100%",
-    padding: "16px",
-    marginTop: "12px",
-    border: "none",
-    borderRadius: "16px",
-    background: "linear-gradient(90deg,#ff8a9a,#ff3cac,#8b5cff)",
-    color: "white",
-    cursor: "pointer"
-  }
-
+  bg: { minHeight: "100vh", background: "linear-gradient(160deg,#6a3cff,#9b4dff,#ff6aa6)", display: "flex", justifyContent: "center", alignItems: "center", fontFamily: "Inter" },
+  container: { width: "360px", textAlign: "center", color: "white" },
+  title: { fontSize: "34px", fontWeight: "700", marginBottom: "15px" },
+  btn: { width: "100%", padding: "16px", marginTop: "12px", borderRadius: "40px", border: "none", background: "linear-gradient(90deg,#ff7aa2,#ff4ecd,#7a5cff)", color: "white", fontSize: "16px", cursor: "pointer" },
+  card: { width: "340px", background: "rgba(255,255,255,0.15)", padding: "20px", borderRadius: "20px", color: "white" },
+  search: { width: "100%", padding: "12px", borderRadius: "10px", border: "none" },
+  friend: { display: "flex", alignItems: "center", gap: "10px", padding: "10px", background: "white", color: "#111", borderRadius: "12px", marginTop: "8px", cursor: "pointer" },
+  avatar: { width: "40px", height: "40px", borderRadius: "50%" },
+  answer: { width: "100%", padding: "14px", marginTop: "10px", border: "none", borderRadius: "12px", background: "#8b5cff", color: "white", cursor: "pointer" },
+  msg: { background: "white", color: "#222", padding: "10px", borderRadius: "10px", marginTop: "8px" },
+  box: { marginTop: "20px" },
+  lock: { width: "100%", padding: "16px", marginTop: "12px", borderRadius: "40px", border: "none", background: "#ff4ecd", color: "white" }
 }
