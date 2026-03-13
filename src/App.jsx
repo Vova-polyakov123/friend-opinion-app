@@ -74,11 +74,9 @@ export default function App() {
   }
 
   const filteredFriends = friends.filter(f =>
-
     (f.first_name + " " + (f.last_name || ""))
       .toLowerCase()
       .includes(search.toLowerCase())
-
   )
 
   function startQuiz(friend) {
@@ -107,7 +105,12 @@ export default function App() {
 
   }
 
+  function buyVoices() {
+    alert("Функция покупки голосов подключается в настройках VK")
+  }
+
   async function shareStory() {
+
     try {
 
       await bridge.send("VKWebAppShowStoryBox", {
@@ -115,7 +118,7 @@ export default function App() {
         background_type: "gradient",
 
         background_color: "#6a3cff",
-        background_color_bottom: "#ff6aa6",
+        background_bottom_color: "#ff6aa6",
 
         attachment: {
           type: "url",
@@ -128,33 +131,9 @@ export default function App() {
     } catch (e) {
 
       console.log(e)
-      alert("Ошибка сторис")
 
     }
-  } async function shareStory() {
-    try {
 
-      await bridge.send("VKWebAppShowStoryBox", {
-
-        background_type: "gradient",
-
-        background_color: "#6a3cff",
-        background_color_bottom: "#ff6aa6",
-
-        attachment: {
-          type: "url",
-          url: `https://vk.com/appXXXX#${user?.id}`,
-          text: "Пройди анонимный опрос обо мне"
-        }
-
-      })
-
-    } catch (e) {
-
-      console.log(e)
-      alert("Ошибка сторис")
-
-    }
   }
 
   if (screen === "menu") {
@@ -413,8 +392,7 @@ const styles = {
   title: {
     fontSize: "34px",
     fontWeight: "700",
-    marginBottom: "8px",
-    textShadow: "0 5px 20px rgba(0,0,0,0.25)"
+    marginBottom: "8px"
   },
 
   subtitle: {
@@ -433,8 +411,7 @@ const styles = {
     cursor: "pointer",
     background: "linear-gradient(90deg,#ff7aa2,#ff4ecd,#7a5cff)",
     color: "white",
-    fontWeight: "600",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.25)"
+    fontWeight: "600"
   },
 
   search: {
@@ -450,9 +427,7 @@ const styles = {
     marginTop: "25px",
     background: "rgba(255,255,255,0.15)",
     padding: "18px",
-    borderRadius: "22px",
-    backdropFilter: "blur(15px)",
-    boxShadow: "0 8px 30px rgba(0,0,0,0.2)"
+    borderRadius: "22px"
   },
 
   msg: {
@@ -472,20 +447,15 @@ const styles = {
     border: "none",
     background: "linear-gradient(90deg,#ff9a9e,#ff4ecd,#7a5cff)",
     color: "white",
-    cursor: "pointer",
-    fontSize: "16px",
-    fontWeight: "600",
-    boxShadow: "0 8px 25px rgba(0,0,0,0.25)"
+    cursor: "pointer"
   },
 
   card: {
     width: "340px",
     background: "rgba(255,255,255,0.15)",
-    backdropFilter: "blur(20px)",
     padding: "22px",
     borderRadius: "24px",
-    color: "white",
-    boxShadow: "0 8px 35px rgba(0,0,0,0.3)"
+    color: "white"
   },
 
   friend: {
@@ -497,8 +467,7 @@ const styles = {
     color: "#111",
     borderRadius: "14px",
     marginTop: "8px",
-    cursor: "pointer",
-    fontWeight: "500"
+    cursor: "pointer"
   },
 
   avatar: {
@@ -515,10 +484,7 @@ const styles = {
     borderRadius: "16px",
     background: "linear-gradient(90deg,#ff8a9a,#ff3cac,#8b5cff)",
     color: "white",
-    cursor: "pointer",
-    fontSize: "16px",
-    fontWeight: "600",
-    boxShadow: "0 6px 20px rgba(0,0,0,0.25)"
+    cursor: "pointer"
   }
 
 }
