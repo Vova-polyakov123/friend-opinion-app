@@ -30,9 +30,7 @@ export default function App() {
         setUser(userInfo)
 
       } catch (e) {
-
         console.log(e)
-
       }
 
     }
@@ -60,11 +58,9 @@ export default function App() {
 
     try {
 
-      const res = await bridge.send("VKWebAppGetFriends", {
-        fields: "photo_100"
-      })
+      const res = await bridge.send("VKWebAppGetFriends", { fields: "photo_100" })
 
-      const list = res.items || res.users || []
+      const list = res.items || []
 
       setFriends(list)
 
@@ -77,8 +73,6 @@ export default function App() {
       console.log(e)
 
       setFriendsError(true)
-
-      alert("Нужно разрешить доступ к друзьям")
 
     }
 
@@ -131,12 +125,8 @@ export default function App() {
         item: "answers3"
       })
 
-      alert("Покупка завершена")
-
     } catch (e) {
-
       console.log(e)
-
     }
 
   }
@@ -147,9 +137,9 @@ export default function App() {
 
       await bridge.send("VKWebAppShowStoryBox", {
 
-        background_type: "image",
+        background_type: "gradient",
 
-        background_image: "https://i.imgur.com/8Km9tLL.png",
+        background_color: "ff4ecd",
 
         attachment: {
           type: "url",
@@ -180,9 +170,7 @@ export default function App() {
 
           <h1 style={styles.title}>🔥 Тайное мнение друзей</h1>
 
-          <p style={styles.subtitle}>
-            Узнай что друзья думают о тебе
-          </p>
+          <p style={styles.subtitle}>Узнай что друзья думают о тебе</p>
 
           <button style={styles.btn} onClick={() => setScreen("intro")}>
             👥 Начать
@@ -270,6 +258,20 @@ export default function App() {
             onChange={(e) => setSearch(e.target.value)}
           />
 
+          {friendsError && (
+
+            <div>
+
+              <p>Нужно разрешить доступ к друзьям</p>
+
+              <button style={styles.btn} onClick={requestFriends}>
+                Разрешить доступ
+              </button>
+
+            </div>
+
+          )}
+
           {filteredFriends.map(f => (
 
             <div
@@ -322,7 +324,9 @@ export default function App() {
               style={styles.answer}
               onClick={() => answerClick(a)}
             >
+
               {a}
+
             </button>
 
           ))}
@@ -368,7 +372,11 @@ export default function App() {
           <h2>Ответы друзей</h2>
 
           {inbox.map((m, i) => (
-            <div key={i} style={styles.msg}>{m}</div>
+
+            <div key={i} style={styles.msg}>
+              {m}
+            </div>
+
           ))}
 
           <button style={styles.btn} onClick={() => setScreen("menu")}>
