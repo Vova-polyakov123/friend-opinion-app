@@ -8,7 +8,6 @@ export default function App() {
 
   const [friends, setFriends] = useState([])
   const [search, setSearch] = useState("")
-  const [friendsError, setFriendsError] = useState(false)
 
   const [selectedFriend, setSelectedFriend] = useState(null)
 
@@ -68,13 +67,9 @@ export default function App() {
 
       setScreen("friends")
 
-      setFriendsError(false)
-
     } catch (e) {
 
-      console.log(e)
-
-      setFriendsError(true)
+      alert("Нужно разрешить доступ к друзьям")
 
     }
 
@@ -89,9 +84,7 @@ export default function App() {
   function startQuiz(friend) {
 
     setSelectedFriend(friend)
-
     setQIndex(0)
-
     setAnswers([])
 
     setScreen("quiz")
@@ -129,20 +122,16 @@ export default function App() {
         background_bottom_color: "#ff6aa6",
 
         attachment: {
-
           type: "url",
-
           url: window.location.href,
-
           text: "🔥 Пройди анонимный опрос обо мне"
-
         }
 
       })
 
-    } catch (e) {
+    } catch (error) {
 
-      console.log("Story error:", e)
+      console.log("Story error:", error)
 
       alert("Сторис работает только внутри VK")
 
@@ -160,19 +149,17 @@ export default function App() {
 
           <h1 style={styles.title}>🔥 Тайное мнение друзей</h1>
 
-          <p style={styles.subtitle}>
-            Узнай что друзья думают о тебе
-          </p>
+          <p style={styles.subtitle}>Узнай что друзья думают о тебе</p>
 
-          <button style={styles.btn} onClick={() => setScreen("intro")}>
+          <button type="button" style={styles.btn} onClick={() => setScreen("intro")}>
             👥 Начать
           </button>
 
-          <button style={styles.btn} onClick={() => setScreen("inbox")}>
+          <button type="button" style={styles.btn} onClick={() => setScreen("inbox")}>
             ✉ Мои ответы
           </button>
 
-          <button style={styles.btn} onClick={shareStory}>
+          <button type="button" style={styles.btn} onClick={() => shareStory()}>
             📲 Поделиться в сторис
           </button>
 
@@ -194,12 +181,9 @@ export default function App() {
 
           <h2>Как это работает</h2>
 
-          <p>
-            Ты выбираешь друга и отвечаешь на вопросы.
-            Ответы отправляются анонимно.
-          </p>
+          <p>Ты выбираешь друга и отвечаешь на вопросы. Ответы анонимные.</p>
 
-          <button style={styles.btn} onClick={requestFriends}>
+          <button style={styles.btn} onClick={() => requestFriends()}>
             Продолжить
           </button>
 
@@ -226,7 +210,7 @@ export default function App() {
           <h2>Выбери друга</h2>
 
           <input
-            placeholder="Поиск друга"
+            placeholder="Поиск"
             style={styles.search}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -234,11 +218,7 @@ export default function App() {
 
           {filteredFriends.map(f => (
 
-            <div
-              key={f.id}
-              style={styles.friend}
-              onClick={() => startQuiz(f)}
-            >
+            <div key={f.id} style={styles.friend} onClick={() => startQuiz(f)}>
 
               <img
                 src={f.photo_100 || "https://vk.com/images/camera_200.png"}
@@ -280,14 +260,8 @@ export default function App() {
 
           {q.a.map((a, i) => (
 
-            <button
-              key={i}
-              style={styles.answer}
-              onClick={() => answerClick(a)}
-            >
-
+            <button key={i} style={styles.answer} onClick={() => answerClick(a)}>
               {a}
-
             </button>
 
           ))}
@@ -310,7 +284,7 @@ export default function App() {
 
           <h2>Ответ отправлен</h2>
 
-          <button style={styles.btn} onClick={shareStory}>
+          <button style={styles.btn} onClick={() => shareStory()}>
             📲 Поделиться в сторис
           </button>
 
@@ -366,7 +340,6 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    fontFamily: "Inter, Arial",
     padding: "20px"
   },
 
