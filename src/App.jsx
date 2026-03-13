@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 import bridge from "@vkontakte/vk-bridge"
+import { Button } from "@vkontakte/vkui"
 
 export default function App() {
 
@@ -61,30 +62,24 @@ export default function App() {
 
       const res = await bridge.send("VKWebAppGetFriends")
 
-      const list = res.items || []
-
-      setFriends(list)
+      setFriends(res.items || [])
 
       setScreen("friends")
 
     } catch (e) {
 
-      alert("Нужно разрешить доступ к друзьям")
+      alert("Разреши доступ к друзьям")
 
     }
 
   }
 
-  const filteredFriends = friends.filter(f =>
-    (f.first_name + " " + (f.last_name || ""))
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  )
-
   function startQuiz(friend) {
 
     setSelectedFriend(friend)
+
     setQIndex(0)
+
     setAnswers([])
 
     setScreen("quiz")
@@ -114,23 +109,13 @@ export default function App() {
     try {
 
       await bridge.send("VKWebAppShowStoryBox", {
-
         background_type: "image",
-
-        url: "https://i.imgur.com/2w7sYhT.png",
-
-        attachment: {
-          type: "url",
-          url: window.location.href,
-          text: "🔥 Узнай тайное мнение друзей"
-        }
-
+        url: "https://vk.com/images/camera_200.png"
       })
 
     } catch (error) {
 
-      console.log("Story error:", error)
-
+      console.log(error)
       alert("Открой приложение внутри VK")
 
     }
@@ -149,120 +134,17 @@ export default function App() {
 
           <p style={styles.subtitle}>Узнай что друзья думают о тебе</p>
 
-          <button style={styles.btn} onClick={() => setScreen("intro")}>
+          <Button size="l" stretched style={{ marginTop: 10 }} onClick={() => setScreen("intro")}>
             👥 Начать
-          </button>
+          </Button>
 
-          <button style={styles.btn} onClick={() => setScreen("inbox")}>
+          <Button size="l" stretched style={{ marginTop: 10 }} onClick={() => setScreen("inbox")}>
             ✉ Мои ответы
-          </button>
+          </Button>
 
-          <button style={styles.btn} onClick={() => shareStory()}>
+          <Button size="l" stretched style={{ marginTop: 10 }} onClick={shareStory}>
             📲 Поделиться в сторис
-          </button>
-
-        </div>
-
-      </div>
-
-    )
-
-  }
-
-  if (screen === "intro") {
-
-    return (
-
-      <div style={styles.bg}>
-
-        <div style={styles.card}>
-
-          <h2>Как это работает</h2>
-
-          <p>Ты выбираешь друга и отвечаешь на вопросы. Ответы анонимные.</p>
-
-          <button style={styles.btn} onClick={() => requestFriends()}>
-            Продолжить
-          </button>
-
-          <button style={styles.btn} onClick={() => setScreen("menu")}>
-            Назад
-          </button>
-
-        </div>
-
-      </div>
-
-    )
-
-  }
-
-  if (screen === "friends") {
-
-    return (
-
-      <div style={styles.bg}>
-
-        <div style={styles.card}>
-
-          <h2>Выбери друга</h2>
-
-          <input
-            placeholder="Поиск"
-            style={styles.search}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-
-          {filteredFriends.map(f => (
-
-            <div key={f.id} style={styles.friend} onClick={() => startQuiz(f)}>
-
-              <img
-                src={f.photo_100 || "https://vk.com/images/camera_200.png"}
-                style={styles.avatar}
-                alt=""
-              />
-
-              {f.first_name}
-
-            </div>
-
-          ))}
-
-          <button style={styles.btn} onClick={() => setScreen("menu")}>
-            Назад
-          </button>
-
-        </div>
-
-      </div>
-
-    )
-
-  }
-
-  if (screen === "quiz" && selectedFriend) {
-
-    const q = questions[qIndex]
-
-    return (
-
-      <div style={styles.bg}>
-
-        <div style={styles.card}>
-
-          <h2>{selectedFriend.first_name}</h2>
-
-          <p>{q.q}</p>
-
-          {q.a.map((a, i) => (
-
-            <button key={i} style={styles.answer} onClick={() => answerClick(a)}>
-              {a}
-            </button>
-
-          ))}
+          </Button>
 
         </div>
 
@@ -278,17 +160,17 @@ export default function App() {
 
       <div style={styles.bg}>
 
-        <div style={styles.card}>
+        <div style={styles.container}>
 
           <h2>Ответ отправлен</h2>
 
-          <button style={styles.btn} onClick={() => shareStory()}>
+          <Button size="l" stretched style={{ marginTop: 10 }} onClick={shareStory}>
             📲 Поделиться в сторис
-          </button>
+          </Button>
 
-          <button style={styles.btn} onClick={() => setScreen("menu")}>
+          <Button size="l" stretched style={{ marginTop: 10 }} onClick={() => setScreen("menu")}>
             На главный экран
-          </button>
+          </Button>
 
         </div>
 
@@ -298,35 +180,15 @@ export default function App() {
 
   }
 
-  if (screen === "inbox") {
-
-    return (
-
-      <div style={styles.bg}>
-
-        <div style={styles.card}>
-
-          <h2>Ответы друзей</h2>
-
-          {inbox.map((m, i) => (
-
-            <div key={i} style={styles.msg}>
-              {m}
-            </div>
-
-          ))}
-
-          <button style={styles.btn} onClick={() => setScreen("menu")}>
-            Назад
-          </button>
-
-        </div>
-
+  return (
+    <div style={styles.bg}>
+      <div style={styles.container}>
+        <Button size="l" stretched onClick={() => setScreen("menu")}>
+          Назад
+        </Button>
       </div>
-
-    )
-
-  }
+    </div>
+  )
 
 }
 
@@ -337,8 +199,7 @@ const styles = {
     background: "linear-gradient(160deg,#6a3cff,#9b4dff,#ff6aa6)",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
-    padding: "20px"
+    alignItems: "center"
   },
 
   container: {
@@ -354,71 +215,6 @@ const styles = {
 
   subtitle: {
     marginBottom: "20px"
-  },
-
-  btn: {
-    width: "100%",
-    padding: "18px",
-    marginTop: "12px",
-    borderRadius: "40px",
-    border: "none",
-    fontSize: "18px",
-    cursor: "pointer",
-    background: "linear-gradient(90deg,#ff7aa2,#ff4ecd,#7a5cff)",
-    color: "white"
-  },
-
-  card: {
-    width: "340px",
-    background: "rgba(255,255,255,0.15)",
-    padding: "22px",
-    borderRadius: "24px",
-    color: "white"
-  },
-
-  search: {
-    width: "100%",
-    padding: "12px",
-    borderRadius: "12px",
-    border: "none",
-    marginTop: "10px"
-  },
-
-  friend: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    padding: "10px",
-    background: "white",
-    color: "#111",
-    borderRadius: "12px",
-    marginTop: "8px",
-    cursor: "pointer"
-  },
-
-  avatar: {
-    width: "40px",
-    height: "40px",
-    borderRadius: "50%"
-  },
-
-  answer: {
-    width: "100%",
-    padding: "14px",
-    marginTop: "10px",
-    borderRadius: "14px",
-    border: "none",
-    background: "#7a5cff",
-    color: "white",
-    cursor: "pointer"
-  },
-
-  msg: {
-    background: "white",
-    color: "#222",
-    padding: "10px",
-    borderRadius: "12px",
-    marginTop: "8px"
   }
 
 }
