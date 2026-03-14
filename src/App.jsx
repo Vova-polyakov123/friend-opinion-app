@@ -109,7 +109,7 @@ export default function App() {
     alert("Функция покупки голосов подключается в настройках VK")
   }
 
-  /* ИСПРАВЛЕНА ТОЛЬКО СТОРИС */
+  /* СТОРИС */
 
   async function shareStory() {
 
@@ -364,6 +364,7 @@ export default function App() {
 }
 
 const styles = {
+
   bg: {
     minHeight: "100vh",
     background: "linear-gradient(160deg,#6a3cff,#9b4dff,#ff6aa6)",
@@ -372,9 +373,13 @@ const styles = {
     alignItems: "center",
     padding: "20px"
   },
+
   container: { width: "360px", textAlign: "center", color: "white" },
+
   title: { fontSize: "34px", fontWeight: "700" },
+
   subtitle: { marginBottom: "20px" },
+
   btn: {
     width: "100%",
     padding: "18px",
@@ -386,6 +391,7 @@ const styles = {
     background: "linear-gradient(90deg,#ff7aa2,#ff4ecd,#7a5cff)",
     color: "white"
   },
+
   card: {
     width: "340px",
     background: "rgba(255,255,255,0.15)",
@@ -393,11 +399,68 @@ const styles = {
     borderRadius: "24px",
     color: "white"
   },
-  search: { width: "100%", padding: "12px", borderRadius: "12px", border: "none", marginTop: "10px" },
-  friend: { display: "flex", alignItems: "center", gap: "10px", padding: "10px", background: "white", color: "#111", borderRadius: "12px", marginTop: "8px", cursor: "pointer" },
-  avatar: { width: "40px", height: "40px", borderRadius: "50%" },
-  answer: { width: "100%", padding: "14px", marginTop: "10px", borderRadius: "14px", border: "none", background: "#7a5cff", color: "white", cursor: "pointer" },
-  msg: { background: "white", color: "#222", padding: "10px", borderRadius: "12px", marginTop: "8px" },
-  box: { marginTop: "20px", background: "rgba(255,255,255,0.15)", padding: "15px", borderRadius: "20px" },
-  lock: { width: "100%", padding: "14px", marginTop: "12px", borderRadius: "40px", border: "none", background: "#ff6aa6", color: "white", cursor: "pointer" }
+
+  search: {
+    width: "100%",
+    padding: "12px",
+    borderRadius: "12px",
+    border: "none",
+    marginTop: "10px"
+  },
+
+  friend: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    padding: "10px",
+    background: "white",
+    color: "#111",
+    borderRadius: "12px",
+    marginTop: "8px",
+    cursor: "pointer"
+  },
+
+  avatar: {
+    width: "40px",
+    height: "40px",
+    borderRadius: "50%"
+  },
+
+  answer: {
+    width: "100%",
+    padding: "14px",
+    marginTop: "10px",
+    borderRadius: "14px",
+    border: "none",
+    background: "#7a5cff",
+    color: "white",
+    cursor: "pointer"
+  },
+
+  msg: {
+    background: "white",
+    color: "#222",
+    padding: "10px",
+    borderRadius: "12px",
+    marginTop: "8px"
+  },
+
+  box: {
+    marginTop: "20px",
+    background: "rgba(255,255,255,0.15)",
+    padding: "15px",
+    borderRadius: "20px"
+  },
+
+  lock: {
+    width: "100%",
+    padding: "14px",
+    marginTop: "12px",
+    borderRadius: "40px",
+    border: "none",
+    background: "#ff6aa6",
+    color: "white",
+    cursor: "pointer"
+  }
+
 }
