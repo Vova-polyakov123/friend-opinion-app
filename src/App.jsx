@@ -24,7 +24,7 @@ export default function App() {
         } else {
           // Если нет, пытаемся получить через переменную окружения (если используется CRA)
           // или можно прямо вписать ID, если он известен
-          setAppId(import.meta.env.REACT_APP_VK_APP_ID || "ВАШ_ID_ПРИЛОЖЕНИЯ");
+          setAppId(import.meta.env.REACT_APP_VK_APP_ID || "54474085");
         }
 
         const userInfo = await bridge.send("VKWebAppGetUserInfo");
