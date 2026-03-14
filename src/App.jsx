@@ -2,30 +2,37 @@ import React, { useState, useEffect } from "react";
 import bridge from "@vkontakte/vk-bridge";
 
 export default function App() {
-  const [screen, setScreen] = useState("menu");
+  const [screen, setScreen] = useState("loading"); // Начинаем с загрузки
   const [user, setUser] = useState(null);
-
   const [friends, setFriends] = useState([]);
   const [search, setSearch] = useState("");
   const [friendsError, setFriendsError] = useState(false);
-
   const [selectedFriend, setSelectedFriend] = useState(null);
-
   const [qIndex, setQIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
-
   const [inbox, setInbox] = useState([]);
+  const [appId, setAppId] = useState(null); // Для хранения ID приложения
 
   useEffect(() => {
     async function init() {
       try {
-        await bridge.send("VKWebAppInit"); // Инициализация VK Bridge
-        const userInfo = await bridge.send("VKWebAppGetUserInfo"); // Получение информации о текущем пользователе
+        // Получаем ID приложения VK, когда оно инициализируется
+        const initData = await bridge.send("VKWebAppInit");
+        // Проверяем, есть ли ID приложения в данных инициализации
+        if (initData && initData.app_id) {
+          setAppId(initData.app_id);
+        } else {
+          // Если нет, пытаемся получить через переменную окружения (если используется CRA)
+          // или можно прямо вписать ID, если он известен
+          setAppId(import.meta.env.REACT_APP_VK_APP_ID || "ВАШ_ID_ПРИЛОЖЕНИЯ");
+        }
+
+        const userInfo = await bridge.send("VKWebAppGetUserInfo");
         setUser(userInfo);
-      } catch (e) {
-        console.error("Initialization error:", e);
-        // Можно добавить отображение ошибки пользователю, если инициализация не удалась
-        setScreen("error"); // Предполагаемый экран ошибки
+        setScreen("menu"); // После успешной инициализации и получения пользователя переходим в меню
+      } catch (error) {
+        console.error("Ошибка инициализации:", error);
+        setScreen("error"); // Переходим на экран ошибки при любой проблеме с инициализацией
       }
     }
     init();
@@ -45,20 +52,22 @@ export default function App() {
   ];
 
   async function requestFriends() {
-    setScreen("loading"); // Переход на экран загрузки
+    setScreen("loading"); // Показываем загрузку перед запросом
     try {
-      const res = await bridge.send("VKWebAppGetFriends", { // Запрос списка друзей
-        fields: "photo_100", // Запрашиваем поле с URL фотографии 100px
-      });
+      const res = await bridge.send("VKWebAppGetFriends", { fields: "photo_100" }); // Запрашиваем фото
       const list = res.items || res.users || [];
       setFriends(list);
       setFriendsError(false);
       setScreen("friends");
     } catch (e) {
-      console.error("VKWebAppGetFriends error:", e);
-      setFriendsError(true);
-      // alert("Нужно разрешить доступ к друзьям"); // Лучше управлять ошибками через UI
-      setScreen("no_friends_access"); // Предполагаемый экран с ошибкой доступа
+      console.error("Ошибка получения друзей:", e);
+      // Если ошибка связана с доступом, переводим на экран без доступа
+      if (e.code === 403 || e.error_reason === "authorization_error") {
+        setScreen("no_friends_access");
+      } else {
+        setFriendsError(true);
+        setScreen("friends"); // Оставляем на экране друзей, но с ошибкой
+      }
     }
   }
 
@@ -80,47 +89,61 @@ export default function App() {
     if (qIndex < questions.length - 1) {
       setQIndex(prev => prev + 1);
     } else {
-      // Имитация получения ответа (в реальном приложении нужно отправлять на сервер)
-      setInbox(prev => [...prev, `💌 Кто-то ответил про тебя`]);
+      // Здесь можно отправить собранные ответы друга куда-то (например, на сервер)
+      // Для примера, просто уведомляем пользователя
+      setInbox(prev => [...prev, `✨ Вы ответили про ${selectedFriend.first_name}`]);
       setScreen("result");
     }
   }
 
   async function buyVoices() {
     try {
-      await bridge.send("VKWebAppShowOrderBox", { // Открытие окна покупки
+      await bridge.send("VKWebAppShowOrderBox", {
         type: "item",
-        item: "answers3" // Идентификатор товара
+        item: "answers3"
       });
-      // alert("Покупка завершена"); // Уведомление пользователя
+      alert("Покупка успешно завершена!"); // Уведомление об успешной покупке
     } catch (e) {
-      console.error("Purchase error:", e);
-      // Обработка ошибки покупки
+      console.error("Ошибка покупки:", e);
+      alert("Произошла ошибка при попытке покупки."); // Уведомление об ошибке
     }
   }
 
   async function shareStory() {
-    if (!user?.id) {
-      alert("Не удалось получить ID пользователя для сторис.");
+    if (!appId) {
+      console.error("ID приложения VK не установлен.");
+      alert("Невозможно поделиться: ID приложения VK неизвестен.");
+      return;
+    }
+    if (!user || !user.id) {
+      console.error("ID пользователя VK не получен.");
+      alert("Невозможно поделиться: информация о пользователе не загружена.");
       return;
     }
     try {
       await bridge.send("VKWebAppShowStoryBox", {
         background_type: "image",
-        url: "https://i.imgur.com/8Km9tLL.png", // URL изображения для сторис
+        // Замените на реальную ссылку на вашу картинку для сторис
+        url: "https://vk.com/images/icons/promo/camera_default.png", // Пример стандартной картинки
         attachment: {
-          // Вложение с ссылкой на ваше приложение
-          // `XXXX` нужно заменить на ID вашего приложения
-          url: `https://vk.com/app${process.env.REACT_APP_VK_APP_ID || "XXXX"}#${user.id}`,
-          text: "go_to_app", // Текст на кнопке вложения
-          type: "url",
-        },
+          name: "open_app", // Системное имя для прикрепления
+          // Используем appId, чтобы ссылка вела на приложение
+          link: `https://vk.com/app${appId}`,
+          // Можно добавить текст, если нужно
+        }
       });
     } catch (e) {
-      console.error("Story sharing error:", e);
-      alert("Ошибка при создании истории. Убедитесь, что приложение открыто в VK.");
+      console.error("Ошибка отправки в сторис:", e);
+      // Более детальная обработка ошибок VKWebAppShowStoryBox
+      if (e.error_type === "client_api_method_failed") {
+        alert("Ошибка: Не удалось показать сторис. Убедитесь, что приложение открыто в VK.");
+      } else {
+        alert("Произошла ошибка при попытке поделиться в сторис.");
+      }
     }
   }
+
+  // --- Рендеринг экранов ---
 
   // Экран загрузки
   if (screen === "loading") {
@@ -308,10 +331,9 @@ export default function App() {
     );
   }
 
-  return null; // По умолчанию ничего не рендерим, пока не определен экран
+  return null; // На всякий случай, если какой-то экран не определен
 }
 
-// Стили остаются без изменений
 const styles = {
   bg: {
     minHeight: "100vh",
