@@ -4,16 +4,16 @@ import { supabase } from "./supabase";
 
 export default function App() {
 
-  const [screen, setScreen] = useState("menu")
-  const [user, setUser] = useState(null)
+  const [screen, setScreen] = useState("menu");
+  const [user, setUser] = useState(null);
 
-  const [friends, setFriends] = useState([])
-  const [search, setSearch] = useState("")
+  const [friends, setFriends] = useState([]);
+  const [search, setSearch] = useState("");
 
-  const [selectedFriend, setSelectedFriend] = useState(null)
+  const [selectedFriend, setSelectedFriend] = useState(null);
 
-  const [qIndex, setQIndex] = useState(0)
-  const [inbox, setInbox] = useState([])
+  const [qIndex, setQIndex] = useState(0);
+  const [inbox, setInbox] = useState([]);
 
   useEffect(() => {
 
@@ -21,23 +21,27 @@ export default function App() {
 
       try {
 
-        await bridge.send("VKWebAppInit")
+        await bridge.send("VKWebAppInit");
 
-        const userInfo = await bridge.send("VKWebAppGetUserInfo")
+        bridge.subscribe(e => {
+          console.log("VK EVENT:", e);
+        });
 
-        setUser(userInfo)
+        const userInfo = await bridge.send("VKWebAppGetUserInfo");
 
-        loadInbox(userInfo.id)
+        setUser(userInfo);
+
+        loadInbox(userInfo.id);
 
       } catch (e) {
-        console.log("VK init error", e)
+        console.log("VK init error", e);
       }
 
     }
 
-    init()
+    init();
 
-  }, [])
+  }, []);
 
   const questions = [
 
@@ -47,7 +51,7 @@ export default function App() {
     { q: "Он хороший друг?", a: ["Да", "Нет", "Возможно", "100%"] },
     { q: "Этот человек популярный?", a: ["Да", "Нет", "Возможно", "100%"] }
 
-  ]
+  ];
 
   async function loadInbox(userId) {
 
@@ -56,29 +60,29 @@ export default function App() {
       const { data } = await supabase
         .from("answers")
         .select("*")
-        .eq("target_user", userId)
+        .eq("target_user", userId);
 
       if (data) {
 
-        const msgs = data.map(a => `${a.question} — ${a.answer}`)
+        const msgs = data.map(a => `${a.question} — ${a.answer}`);
 
-        setInbox(msgs)
+        setInbox(msgs);
 
       }
 
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
 
   }
 
   async function openInbox() {
 
-    if (!user) return
+    if (!user) return;
 
-    await loadInbox(user.id)
+    await loadInbox(user.id);
 
-    setScreen("inbox")
+    setScreen("inbox");
 
   }
 
@@ -86,18 +90,18 @@ export default function App() {
 
     try {
 
-      const res = await bridge.send("VKWebAppGetFriends")
+      const res = await bridge.send("VKWebAppGetFriends");
 
-      const list = res.items || res.users || []
+      const list = res.items || res.users || [];
 
-      setFriends(list)
+      setFriends(list);
 
-      setScreen("friends")
+      setScreen("friends");
 
     } catch (e) {
 
-      console.log(e)
-      alert("Разрешите доступ к друзьям")
+      console.log(e);
+      alert("Разрешите доступ к друзьям");
 
     }
 
@@ -107,22 +111,22 @@ export default function App() {
     (f.first_name + " " + (f.last_name || ""))
       .toLowerCase()
       .includes(search.toLowerCase())
-  )
+  );
 
   function startQuiz(friend) {
 
-    setSelectedFriend(friend)
-    setQIndex(0)
+    setSelectedFriend(friend);
+    setQIndex(0);
 
-    setScreen("quiz")
+    setScreen("quiz");
 
   }
 
   async function answerClick(a) {
 
-    if (!user || !selectedFriend) return
+    if (!user || !selectedFriend) return;
 
-    const question = questions[qIndex].q
+    const question = questions[qIndex].q;
 
     try {
 
@@ -133,19 +137,19 @@ export default function App() {
         question: question,
         answer: a
 
-      })
+      });
 
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
 
     if (qIndex < questions.length - 1) {
 
-      setQIndex(prev => prev + 1)
+      setQIndex(prev => prev + 1);
 
     } else {
 
-      setScreen("result")
+      setScreen("result");
 
     }
 
@@ -159,19 +163,17 @@ export default function App() {
 
         background_type: "image",
 
-        background_url:
-          "https://friend-opinion-app-o7ah.vercel.app/story.png",
+        background_url: "https://friend-opinion-app-skew.vercel.app/story.png",
 
-        open_url:
-          "https://vk.com/app54474085"
+        open_url: "https://vk.com/app54474085"
 
-      })
+      });
 
     } catch (e) {
 
-      console.log("Story error", e)
+      console.log("Story error", e);
 
-      alert("Ошибка сторис")
+      alert("Ошибка сторис");
 
     }
 
@@ -212,7 +214,7 @@ export default function App() {
 
       </div>
 
-    )
+    );
 
   }
 
@@ -245,7 +247,7 @@ export default function App() {
 
       </div>
 
-    )
+    );
 
   }
 
@@ -293,13 +295,13 @@ export default function App() {
 
       </div>
 
-    )
+    );
 
   }
 
   if (screen === "quiz" && selectedFriend) {
 
-    const q = questions[qIndex]
+    const q = questions[qIndex];
 
     return (
 
@@ -325,7 +327,7 @@ export default function App() {
 
       </div>
 
-    )
+    );
 
   }
 
@@ -348,7 +350,7 @@ export default function App() {
 
       </div>
 
-    )
+    );
 
   }
 
@@ -385,7 +387,7 @@ export default function App() {
 
       </div>
 
-    )
+    );
 
   }
 
@@ -483,4 +485,4 @@ const styles = {
     cursor: "pointer"
   }
 
-}
+};
