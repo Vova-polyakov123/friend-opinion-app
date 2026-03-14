@@ -107,48 +107,54 @@ export default function App() {
 
   }
 
-  async function buyVoices() {
-
-    try {
-
-      await bridge.send("VKWebAppShowOrderBox", {
-        type: "item",
-        item: "answers3"
-      })
-
-      alert("Покупка завершена")
-
-    } catch (e) {
-
-      console.log(e)
-
-    }
-
-  }
-
   async function shareStory() {
-
     try {
 
       await bridge.send("VKWebAppShowStoryBox", {
 
-        background_type: "image",
-        url: "https://i.imgur.com/8Km9tLL.png",
+        background_type: "gradient",
+
+        background_color: "#6a3cff",
+        background_color_bottom: "#ff6aa6",
 
         attachment: {
           type: "url",
           url: `https://vk.com/appXXXX#${user?.id}`,
-          text: "to_store"
+          text: "Пройди анонимный опрос обо мне"
         }
 
       })
 
     } catch (e) {
 
+      console.log(e)
       alert("Ошибка сторис")
 
     }
+  } async function shareStory() {
+    try {
 
+      await bridge.send("VKWebAppShowStoryBox", {
+
+        background_type: "gradient",
+
+        background_color: "#6a3cff",
+        background_color_bottom: "#ff6aa6",
+
+        attachment: {
+          type: "url",
+          url: `https://vk.com/appXXXX#${user?.id}`,
+          text: "Пройди анонимный опрос обо мне"
+        }
+
+      })
+
+    } catch (e) {
+
+      console.log(e)
+      alert("Ошибка сторис")
+
+    }
   }
 
   if (screen === "menu") {
