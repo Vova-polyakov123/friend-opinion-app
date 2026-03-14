@@ -8,7 +8,7 @@ export default function App() {
 
   const [friends, setFriends] = useState([])
   const [search, setSearch] = useState("")
-  const [friendsError, setFriendsError] = useState(false)
+  const [friendsAccess, setFriendsAccess] = useState(null)
 
   const [selectedFriend, setSelectedFriend] = useState(null)
 
@@ -16,26 +16,25 @@ export default function App() {
   const [answers, setAnswers] = useState([])
 
   const [inbox, setInbox] = useState([])
+  const [paid, setPaid] = useState(false)
 
   useEffect(() => {
 
     async function init() {
 
+      await bridge.send("VKWebAppInit")
+
       try {
-
-        await bridge.send("VKWebAppInit")
-        const userInfo = await bridge.send("VKWebAppGetUserInfo")
-        setUser(userInfo)
-
-      } catch (e) {
-        console.log(e)
-      }
+        const u = await bridge.send("VKWebAppGetUserInfo")
+        setUser(u)
+      } catch (e) { }
 
     }
 
     init()
 
   }, [])
+
 
   const questions = [
 
@@ -52,32 +51,36 @@ export default function App() {
 
   ]
 
+
   async function requestFriends() {
 
     try {
 
       const res = await bridge.send("VKWebAppGetFriends")
-      const list = res.items || res.users || []
+
+      const list = res.items || []
 
       setFriends(list)
-      setFriendsError(false)
+      setFriendsAccess(true)
       setScreen("friends")
 
     } catch (e) {
 
-      console.log(e)
-      setFriendsError(true)
-      alert("Нужно разрешить доступ к друзьям")
+      setFriendsAccess(false)
 
     }
 
   }
 
+
   const filteredFriends = friends.filter(f =>
+
     (f.first_name + " " + (f.last_name || ""))
       .toLowerCase()
       .includes(search.toLowerCase())
+
   )
+
 
   function startQuiz(friend) {
 
@@ -87,6 +90,7 @@ export default function App() {
     setScreen("quiz")
 
   }
+
 
   function answerClick(a) {
 
@@ -98,18 +102,42 @@ export default function App() {
 
     } else {
 
-      setInbox(prev => [...prev, "💌 Кто-то ответил про тебя"])
+      setInbox(prev => [
+        ...prev,
+        {
+          text: "💌 Кто-то ответил про тебя",
+          locked: true
+        }
+      ])
+
       setScreen("result")
 
     }
 
   }
 
-  function buyVoices() {
-    alert("Функция покупки голосов подключается в настройках VK")
+
+
+  async function buyVoices() {
+
+    try {
+
+      await bridge.send("VKWebAppShowOrderBox", {
+        type: "item",
+        item: "answers_unlock"
+      })
+
+      setPaid(true)
+
+      setInbox(prev =>
+        prev.map(x => ({ ...x, locked: false }))
+      )
+
+    } catch (e) { }
+
   }
 
-  /* СТОРИС */
+
 
   async function shareStory() {
 
@@ -118,24 +146,21 @@ export default function App() {
       await bridge.send("VKWebAppShowStoryBox", {
 
         background_type: "image",
-
-        url: window.location.origin + "/story.png",
+        url: "https://i.imgur.com/8Km9tLL.png",
 
         attachment: {
           type: "url",
-          url: window.location.href,
-          text: "🔥 Узнай тайное мнение друзей"
+          url: "https://vk.com/appXXXX",
+          text: "to_store"
         }
 
       })
 
-    } catch (e) {
-
-      console.log("Story error:", e)
-
-    }
+    } catch (e) { }
 
   }
+
+
 
   if (screen === "menu") {
 
@@ -151,35 +176,23 @@ export default function App() {
             Узнай что друзья думают о тебе
           </p>
 
-          <button style={styles.btn} onClick={() => setScreen("intro")}>
+          <button style={styles.btn}
+            onClick={() => setScreen("intro")}
+          >
             👥 Начать
           </button>
 
-          <button style={styles.btn} onClick={() => setScreen("inbox")}>
+          <button style={styles.btn}
+            onClick={() => setScreen("inbox")}
+          >
             ✉ Мои ответы
           </button>
 
-          <button style={styles.btn} onClick={shareStory}>
-            📲 Поделиться в сторис
+          <button style={styles.btn}
+            onClick={shareStory}
+          >
+            📲 Поделиться
           </button>
-
-          <div style={styles.box}>
-
-            <p>Пример сообщений</p>
-
-            <div style={styles.msg}>
-              ❤️ Кто-то тайно влюблён в тебя
-            </div>
-
-            <div style={styles.msg}>
-              🔥 Ты очень нравишься одному другу
-            </div>
-
-            <button style={styles.lock} onClick={buyVoices}>
-              🔒 Узнать кто ответил — 3 голоса
-            </button>
-
-          </div>
 
         </div>
 
@@ -189,6 +202,8 @@ export default function App() {
 
   }
 
+
+
   if (screen === "intro") {
 
     return (
@@ -197,18 +212,28 @@ export default function App() {
 
         <div style={styles.card}>
 
-          <h2>Как это работает</h2>
+          <h2>Как работает приложение</h2>
 
           <p>
-            Ты выбираешь друга и отвечаешь на вопросы.
-            Ответы отправляются анонимно.
+            Вы выбираете друга из списка
+            и отвечаете на вопросы.
+            Ответы приходят анонимно.
           </p>
 
-          <button style={styles.btn} onClick={requestFriends}>
+          <p>
+            Чтобы выбрать друга,
+            нужно разрешить доступ к списку друзей.
+          </p>
+
+          <button style={styles.btn}
+            onClick={requestFriends}
+          >
             Продолжить
           </button>
 
-          <button style={styles.btn} onClick={() => setScreen("menu")}>
+          <button style={styles.btn}
+            onClick={() => setScreen("menu")}
+          >
             Назад
           </button>
 
@@ -220,6 +245,45 @@ export default function App() {
 
   }
 
+
+
+  if (friendsAccess === false) {
+
+    return (
+
+      <div style={styles.bg}>
+
+        <div style={styles.card}>
+
+          <h2>Нужен доступ к друзьям</h2>
+
+          <p>
+            Без доступа нельзя выбрать друга
+            для опроса
+          </p>
+
+          <button style={styles.btn}
+            onClick={requestFriends}
+          >
+            Разрешить доступ
+          </button>
+
+          <button style={styles.btn}
+            onClick={() => setScreen("menu")}
+          >
+            Назад
+          </button>
+
+        </div>
+
+      </div>
+
+    )
+
+  }
+
+
+
   if (screen === "friends") {
 
     return (
@@ -228,13 +292,13 @@ export default function App() {
 
         <div style={styles.card}>
 
-          <h2>Выбери друга</h2>
+          <h2>Выберите друга</h2>
 
           <input
-            placeholder="Поиск друга"
             style={styles.search}
+            placeholder="Поиск"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
           />
 
           {filteredFriends.map(f => (
@@ -246,18 +310,19 @@ export default function App() {
             >
 
               <img
-                src={f.photo_100 || "https://vk.com/images/camera_200.png"}
+                src={f.photo_100}
                 style={styles.avatar}
-                alt=""
               />
 
-              {f.first_name}
+              {f.first_name} {f.last_name}
 
             </div>
 
           ))}
 
-          <button style={styles.btn} onClick={() => setScreen("menu")}>
+          <button style={styles.btn}
+            onClick={() => setScreen("menu")}
+          >
             Назад
           </button>
 
@@ -268,6 +333,8 @@ export default function App() {
     )
 
   }
+
+
 
   if (screen === "quiz" && selectedFriend) {
 
@@ -290,9 +357,7 @@ export default function App() {
               style={styles.answer}
               onClick={() => answerClick(a)}
             >
-
               {a}
-
             </button>
 
           ))}
@@ -305,6 +370,8 @@ export default function App() {
 
   }
 
+
+
   if (screen === "result") {
 
     return (
@@ -315,11 +382,10 @@ export default function App() {
 
           <h2>Ответ отправлен</h2>
 
-          <button style={styles.btn} onClick={shareStory}>
-            📲 Поделиться в сторис
-          </button>
-
-          <button style={styles.btn} onClick={() => setScreen("menu")}>
+          <button
+            style={styles.btn}
+            onClick={() => setScreen("menu")}
+          >
             На главный экран
           </button>
 
@@ -330,6 +396,8 @@ export default function App() {
     )
 
   }
+
+
 
   if (screen === "inbox") {
 
@@ -344,12 +412,28 @@ export default function App() {
           {inbox.map((m, i) => (
 
             <div key={i} style={styles.msg}>
-              {m}
+
+              {m.text}
+
+              {m.locked && !paid && (
+
+                <button
+                  style={styles.lock}
+                  onClick={buyVoices}
+                >
+                  🔒 Узнать кто — 3 голоса
+                </button>
+
+              )}
+
             </div>
 
           ))}
 
-          <button style={styles.btn} onClick={() => setScreen("menu")}>
+          <button
+            style={styles.btn}
+            onClick={() => setScreen("menu")}
+          >
             Назад
           </button>
 
@@ -363,6 +447,8 @@ export default function App() {
 
 }
 
+
+
 const styles = {
 
   bg: {
@@ -371,22 +457,32 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    fontFamily: "Inter",
     padding: "20px"
   },
 
-  container: { width: "360px", textAlign: "center", color: "white" },
+  container: {
+    width: "360px",
+    textAlign: "center",
+    color: "white"
+  },
 
-  title: { fontSize: "34px", fontWeight: "700" },
+  title: {
+    fontSize: "34px",
+    fontWeight: "700"
+  },
 
-  subtitle: { marginBottom: "20px" },
+  subtitle: {
+    marginBottom: "20px"
+  },
 
   btn: {
     width: "100%",
-    padding: "18px",
+    padding: "16px",
     marginTop: "12px",
     borderRadius: "40px",
     border: "none",
-    fontSize: "18px",
+    fontSize: "16px",
     cursor: "pointer",
     background: "linear-gradient(90deg,#ff7aa2,#ff4ecd,#7a5cff)",
     color: "white"
@@ -395,14 +491,15 @@ const styles = {
   card: {
     width: "340px",
     background: "rgba(255,255,255,0.15)",
-    padding: "22px",
-    borderRadius: "24px",
+    backdropFilter: "blur(20px)",
+    padding: "20px",
+    borderRadius: "20px",
     color: "white"
   },
 
   search: {
     width: "100%",
-    padding: "12px",
+    padding: "10px",
     borderRadius: "12px",
     border: "none",
     marginTop: "10px"
@@ -412,9 +509,9 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "10px",
-    padding: "10px",
     background: "white",
     color: "#111",
+    padding: "10px",
     borderRadius: "12px",
     marginTop: "8px",
     cursor: "pointer"
@@ -430,9 +527,9 @@ const styles = {
     width: "100%",
     padding: "14px",
     marginTop: "10px",
-    borderRadius: "14px",
     border: "none",
-    background: "#7a5cff",
+    borderRadius: "14px",
+    background: "linear-gradient(90deg,#ff8a9a,#ff3cac,#8b5cff)",
     color: "white",
     cursor: "pointer"
   },
@@ -440,25 +537,18 @@ const styles = {
   msg: {
     background: "white",
     color: "#222",
-    padding: "10px",
+    padding: "12px",
     borderRadius: "12px",
-    marginTop: "8px"
-  },
-
-  box: {
-    marginTop: "20px",
-    background: "rgba(255,255,255,0.15)",
-    padding: "15px",
-    borderRadius: "20px"
+    marginTop: "10px"
   },
 
   lock: {
     width: "100%",
-    padding: "14px",
-    marginTop: "12px",
-    borderRadius: "40px",
+    padding: "12px",
+    marginTop: "10px",
     border: "none",
-    background: "#ff6aa6",
+    borderRadius: "30px",
+    background: "#ff4ecd",
     color: "white",
     cursor: "pointer"
   }
