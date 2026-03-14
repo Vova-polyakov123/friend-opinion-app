@@ -1,18 +1,12 @@
-
-
-javascript
-
-Копировать
-
-
-
 import React, { useState, useEffect } from "react";
 
 import bridge from "@vkontakte/vk-bridge";
 
 export default function App() {
 
-  const [screen, setScreen] = useState("menu");
+  // Состояния для управления экранами приложения
+
+  const [screen, setScreen] = useState("loading"); // Начальный экран "loading"
 
   const [user, setUser] = useState(null);
 
@@ -20,17 +14,17 @@ export default function App() {
 
   const [search, setSearch] = useState("");
 
-  const [friendsAccess, setFriendsAccess] = useState(null); // null = не запрашивали, true = разрешено, false = отказано
+  const [friendsAccess, setFriendsAccess] = useState(null); // null - не запрашивали, true - есть доступ, false - нет доступа
 
   const [selectedFriend, setSelectedFriend] = useState(null);
 
-  const [qIndex, setQIndex] = useState(0);
+  const [qIndex, setQIndex] = useState(0); // Текущий индекс вопроса
 
-  const [currentAnswers, setCurrentAnswers] = useState([]); // Ответы на текущий опрос
+  const [currentAnswers, setCurrentAnswers] = useState([]); // Ответы для текущего опроса
 
-  const [inbox, setInbox] = useState([]);
+  const [inbox, setInbox] = useState([]); // Входящие сообщения/ответы
 
-  const [paid, setPaid] = useState(false);
+  const [paid, setPaid] = useState(false); // Флаг оплаты
 
   // Список вопросов для опроса
 
@@ -58,23 +52,39 @@ export default function App() {
 
   ];
 
-  // Эффект для инициализации VK Bridge и получения данных пользователя
+  // Инициализация приложения при монтировании компонента
 
   useEffect(() => {
 
     async function initApp() {
 
-      await bridge.send("VKWebAppInit");
-
       try {
 
-        const userInfo = await bridge.send("VKWebAppGetUserInfo");
+        // 1. Инициализация VK Bridge
 
-        setUser(userInfo);
+        await bridge.send("VKWebAppInit");
 
-      } catch (e) {
+        console.log("VKWebAppInit successful");
 
-        console.error("Ошибка VKWebAppGetUserInfo:", e);
+        // 2. Получение информации о пользователе
+
+        const u = await bridge.send("VKWebAppGetUserInfo");
+
+        setUser(u);
+
+        console.log("VKWebAppGetUserInfo successful", u);
+
+        // После успешной инициализации и получения пользователя, переходим к главному меню
+
+        setScreen("menu");
+
+      } catch (error) {
+
+        console.error("Ошибка инициализации приложения:", error);
+
+        // Если инициализация не удалась, отображаем экран ошибки
+
+        setScreen("error");
 
       }
 
@@ -82,43 +92,65 @@ export default function App() {
 
     initApp();
 
-  }, []);
+  }, []); // Пустой массив зависимостей означает, что эффект выполнится один раз после монтирования
 
-  // Функция для запроса доступа к списку друзей
+  // Функция запроса доступа к списку друзей
 
   async function requestFriendsAccess() {
 
+    setScreen("loading"); // Показываем индикатор загрузки
+
     try {
 
-      const friendsResponse = await bridge.send("VKWebAppGetFriends");
+      // Запрашиваем доступ к списку друзей
 
-      const friendList = friendsResponse.items || [];
+      const res = await bridge.send("VKWebAppGetFriends");
+
+      const friendList = res.items || [];
 
       setFriends(friendList);
 
-      setFriendsAccess(true);
+      setFriendsAccess(true); // Доступ предоставлен
 
-      setScreen("friends");
+      setScreen("friends"); // Переключаемся на экран списка друзей
+
+      console.log("VKWebAppGetFriends successful", friendList);
 
     } catch (error) {
 
       console.error("Ошибка VKWebAppGetFriends:", error);
 
-      setFriendsAccess(false); // Отмечаем, что доступ не предоставлен
+      setFriendsAccess(false); // Доступ не предоставлен (или произошла ошибка)
+
+      // Проверяем, была ли это ошибка отказа в доступе
+
+      if (error.error_type === "permission_denied") {
+
+        setScreen("no_friends_access"); // Экран с сообщением о необходимости доступа
+
+      } else {
+
+        // Другая ошибка (например, проблема сети), показываем общий экран ошибки
+
+        setScreen("error");
+
+      }
 
     }
 
   }
 
-  // Фильтрация друзей по поисковому запросу
+  // Фильтрация списка друзей по поисковому запросу
 
-  const filteredFriends = friends.filter((friend) =>
+  const filteredFriends = friends.filter(
 
-    (friend.first_name + " " + (friend.last_name || ""))
+    (friend) =>
 
-      .toLowerCase()
+      (friend.first_name + " " + (friend.last_name || ""))
 
-      .includes(search.toLowerCase())
+        .toLowerCase()
+
+        .includes(search.toLowerCase())
 
   );
 
@@ -156,25 +188,37 @@ export default function App() {
 
       // В реальном приложении, здесь отправляем данные на сервер
 
-      setInbox((prev) => [
+      if (selectedFriend) { // Проверяем, выбран ли друг
 
-        ...prev,
+        setInbox((prev) => [
 
-        {
+          ...prev,
 
-          text: `💌 Кто-то ответил про ${selectedFriend.first_name}.`,
+          {
 
-          locked: true, // Ответ по умолчанию заблокирован
+            text: `💌 Кто-то ответил про ${selectedFriend.first_name}.`,
 
-          friendId: selectedFriend.id,
+            locked: true, // Ответ по умолчанию заблокирован
 
-          answers: updatedAnswers,
+            friendId: selectedFriend.id,
 
-        },
+            answers: updatedAnswers, // Сохраняем собранные ответы
 
-      ]);
+          },
 
-      setScreen("result");
+        ]);
+
+        setScreen("result"); // Переходим на экран результата
+
+      } else {
+
+        // Если selectedFriend по какой-то причине null, возвращаемся на главный экран
+
+        console.error("Ошибка: selectedFriend не установлен при завершении опроса.");
+
+        setScreen("menu");
+
+      }
 
     }
 
@@ -190,19 +234,23 @@ export default function App() {
 
         type: "item",
 
-        item: "answers_unlock", // Идентификатор товара
+        item: "answers_unlock", // Уникальный идентификатор товара для VK
 
       });
 
       setPaid(true); // Отмечаем, что оплата прошла успешно
 
-      // Разблокируем все ответы
+      // Разблокируем все ответы во входящих
 
       setInbox((prev) => prev.map((item) => ({ ...item, locked: false })));
 
+      console.log("Payment successful");
+
     } catch (error) {
 
-      console.error("Ошибка покупки:", error);
+      console.error("Ошибка при покупке:", error);
+
+      // Здесь можно сообщить пользователю, что покупка не удалась
 
     }
 
@@ -214,39 +262,97 @@ export default function App() {
 
     try {
 
-      const appUrl = "https://vk.com/app54474085"; // Замените ID вашего приложения!
+      // Замените 'XXXX' на реальный ID вашего приложения VK
+
+      // Для локальной разработки можно использовать временный URL, но для продакшена нужен реальный.
+
+      const appUrl = "https://vk.com/app54474085"; // Пример: https://vk.com/app<YOUR_APP_ID>
 
       await bridge.send("VKWebAppShowStoryBox", {
 
-        background_type: "color", // Используем цветной фон
+        background_type: "color", // Тип фона для сторис (можно "image" для картинки)
 
-        color: "#7A3CFF", // Цвет фона
+        color: "#7A3CFF",        // Цвет фона, если background_type "color"
 
         attachment: {
 
-          name: "link",
+          name: "link",          // Тип вложения - ссылка
 
-          url: appUrl,
+          url: appUrl,           // URL, на который ведет ссылка
 
-          text_color: "#FFFFFF", // Цвет текста на кнопке
+          text_color: "#FFFFFF", // Цвет текста на кнопке/превью
 
-          caption: "Перейти в приложение", // Текст на кнопке
+          caption: "Перейти в приложение", // Текст на кнопке/превью
 
         },
 
       });
 
+      console.log("Story share initiated");
+
     } catch (error) {
 
-      console.error("Ошибка VKWebAppShowStoryBox:", error);
+      console.error("Ошибка при отправке сторис:", error);
 
-      // Здесь можно предложить пользователю поделиться другим способом, если сторис не отправились
+      // Здесь можно показать уведомление пользователю об ошибке,
+
+      // например, "Не удалось отправить сторис. Попробуйте позже."
 
     }
 
   }
 
   // --- Рендеринг экранов ---
+
+  // Экран загрузки
+
+  if (screen === "loading") {
+
+    return (
+
+      <div style={styles.bg}>
+
+        <div style={styles.container}>
+
+          <h1 style={styles.title}>Загрузка...</h1>
+
+          <p style={styles.subtitle}>Инициализация приложения...</p>
+
+        </div>
+
+      </div>
+
+    );
+
+  }
+
+  // Экран общей ошибки
+
+  if (screen === "error") {
+
+    return (
+
+      <div style={styles.bg}>
+
+        <div style={styles.container}>
+
+          <h1 style={styles.title}>Ошибка загрузки</h1>
+
+          <p style={styles.subtitle}>Проверьте подключение к сети или попробуйте позже.</p>
+
+          <button style={styles.btn} onClick={() => window.location.reload()}>
+
+            Повторить попытку
+
+          </button>
+
+        </div>
+
+      </div>
+
+    );
+
+  }
 
   // Главное меню
 
@@ -314,6 +420,8 @@ export default function App() {
 
           </p>
 
+          {/* Кнопка вызывает запрос доступа к друзьям */}
+
           <button style={styles.btn} onClick={requestFriendsAccess}>
 
             Продолжить
@@ -334,43 +442,9 @@ export default function App() {
 
   }
 
-  // Экран ожидания доступа к друзьям
-
-  if (friendsAccess === null) {
-
-    return (
-
-      <div style={styles.bg}>
-
-        <div style={styles.card}>
-
-          <h2>Ожидание доступа...</h2>
-
-          <p>Приложение запрашивает доступ к вашим друзьям.</p>
-
-          <button style={styles.btn} onClick={requestFriendsAccess}>
-
-            Повторить попытку
-
-          </button>
-
-          <button style={styles.btn} onClick={() => setScreen("menu")}>
-
-            Назад
-
-          </button>
-
-        </div>
-
-      </div>
-
-    );
-
-  }
-
   // Экран, если доступ к друзьям не предоставлен
 
-  if (friendsAccess === false) {
+  if (screen === "no_friends_access") {
 
     return (
 
@@ -380,7 +454,7 @@ export default function App() {
 
           <h2>Нужен доступ к друзьям</h2>
 
-          <p>Без доступа нельзя выбрать друга для опроса.</p>
+          <p>Без доступа к списку друзей невозможно выбрать, кого опрашивать.</p>
 
           <button style={styles.btn} onClick={requestFriendsAccess}>
 
@@ -434,7 +508,7 @@ export default function App() {
 
               style={styles.friend}
 
-              onClick={() => startQuiz(friend)} // Вызываем startQuiz при клике
+              onClick={() => startQuiz(friend)} // Вызываем startQuiz при клике на друга
 
             >
 
@@ -464,7 +538,7 @@ export default function App() {
 
   if (screen === "quiz" && selectedFriend) {
 
-    const currentQuestion = questions[qIndex];
+    const currentQuestion = questions[qIndex]; // Получаем текущий вопрос
 
     return (
 
@@ -474,7 +548,7 @@ export default function App() {
 
           <h2>{selectedFriend.first_name}</h2>
 
-          <p>{currentQuestion.q}</p>
+          <p>{currentQuestion.q}</p> {/* Текст вопроса */}
 
           {currentQuestion.a.map((answer, i) => (
 
@@ -484,11 +558,11 @@ export default function App() {
 
               style={styles.answer}
 
-              onClick={() => handleAnswerClick(answer)}
+              onClick={() => handleAnswerClick(answer)} // Обработка нажатия на ответ
 
             >
 
-              {answer}
+              {answer} {/* Текст ответа */}
 
             </button>
 
@@ -550,6 +624,8 @@ export default function App() {
 
               {message.text}
 
+              {/* Кнопка разблокировки видна, только если ответ заблокирован и оплата не пройшла */}
+
               {message.locked && !paid && (
 
                 <button style={styles.lock} onClick={buyAnswersUnlock}>
@@ -578,13 +654,15 @@ export default function App() {
 
   }
 
-  // Если ни один экран не подошел (например, при первой загрузке до инициализации)
+  // Если ни один из вышеперечисленных экранов не подошел, возвращаем null
+
+  // Это может произойти, например, во время первой загрузки, пока screen еще "loading".
 
   return null;
 
 }
 
-// Стили для компонентов
+// Стили для компонентов (оставлены без изменений)
 
 const styles = {
 
@@ -680,6 +758,8 @@ const styles = {
 
     marginTop: "10px",
 
+    boxSizing: "border-box", // Чтобы padding не увеличивал ширину
+
   },
 
   friend: { // Карточка друга в списке
@@ -702,6 +782,14 @@ const styles = {
 
     cursor: "pointer",
 
+    transition: "background-color 0.2s ease", // Плавный переход при наведении
+
+  },
+
+  friendHover: { // Стиль при наведении (можно добавить в JS, но для простоты оставим так)
+
+    background: "#e0e0e0",
+
   },
 
   avatar: { // Аватар пользователя
@@ -711,6 +799,8 @@ const styles = {
     height: "40px",
 
     borderRadius: "50%",
+
+    objectFit: "cover", // Обеспечивает правильное отображение картинки
 
   },
 
@@ -732,6 +822,18 @@ const styles = {
 
     cursor: "pointer",
 
+    fontSize: "16px",
+
+    fontWeight: "600",
+
+    transition: "transform 0.2s ease", // Плавный эффект нажатия
+
+  },
+
+  answerHover: { // Стиль при нажатии (можно добавить в JS)
+
+    transform: "scale(1.02)",
+
   },
 
   msg: { // Стиль для сообщений во входящих
@@ -746,11 +848,13 @@ const styles = {
 
     marginTop: "10px",
 
+    position: "relative", // Для позиционирования кнопки внутри
+
   },
 
   lock: { // Стиль для кнопки "Разблокировать"
 
-    width: "100%",
+    width: "calc(100% - 20px)", // чтобы кнопка не вылезала за padding
 
     padding: "12px",
 
@@ -765,6 +869,16 @@ const styles = {
     color: "white",
 
     cursor: "pointer",
+
+    fontSize: "16px",
+
+    fontWeight: "600",
+
+    position: "absolute", // Позиционируем внутри msg
+
+    bottom: "10px", // Размещаем внизу блока сообщения
+
+    left: "10px",
 
   },
 
