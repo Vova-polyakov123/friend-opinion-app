@@ -49,18 +49,22 @@ export default function App() {
 
   async function loadInbox(userId) {
 
-    const { data } = await supabase
-      .from("answers")
-      .select("*")
-      .eq("target_user", userId)
+    try {
 
-    if (data) {
+      const { data } = await supabase
+        .from("answers")
+        .select("*")
+        .eq("target_user", userId)
 
-      const msgs = data.map(a => `${a.question} — ${a.answer}`)
+      if (data) {
 
-      setInbox(msgs)
+        const msgs = data.map(a => `${a.question} — ${a.answer}`)
 
-    }
+        setInbox(msgs)
+
+      }
+
+    } catch (e) { console.log(e) }
 
   }
 
@@ -112,16 +116,22 @@ export default function App() {
 
   async function answerClick(a) {
 
+    if (!user || !selectedFriend) return
+
     const question = questions[qIndex].q
 
-    await supabase.from("answers").insert({
+    try {
 
-      target_user: selectedFriend.id,
-      from_user: user.id,
-      question: question,
-      answer: a
+      await supabase.from("answers").insert({
 
-    })
+        target_user: selectedFriend.id,
+        from_user: user.id,
+        question: question,
+        answer: a
+
+      })
+
+    } catch (e) { console.log(e) }
 
     if (qIndex < questions.length - 1) {
 
@@ -132,19 +142,6 @@ export default function App() {
       setScreen("result")
 
     }
-
-  }
-
-  async function buyVoices() {
-
-    try {
-
-      await bridge.send("VKWebAppShowOrderBox", {
-        type: "item",
-        item: "answers3"
-      })
-
-    } catch (e) { console.log(e) }
 
   }
 
@@ -159,9 +156,11 @@ export default function App() {
         background_url:
           "https://friend-opinion-app-o7ah.vercel.app/story.png",
 
+        open_url:
+          "https://vk.com/app54474085",
+
         attachment: {
-          type: "url",
-          url: "https://vk.com/app54474085"
+          text: "Тайное мнение друзей"
         }
 
       })
@@ -183,7 +182,9 @@ export default function App() {
 
         <div style={styles.container}>
 
-          <h1 style={styles.title}>🔥 Тайное мнение друзей</h1>
+          <h1 style={styles.title}>
+            🔥 Тайное мнение друзей
+          </h1>
 
           <p style={styles.subtitle}>
             Узнай что друзья думают о тебе
@@ -191,43 +192,18 @@ export default function App() {
 
           <button style={styles.btn}
             onClick={() => setScreen("intro")}>
-
             👥 Начать
-
           </button>
 
           <button style={styles.btn}
             onClick={openInbox}>
-
             ✉ Мои ответы
-
           </button>
 
           <button style={styles.btn}
             onClick={shareStory}>
-
             📲 Поделиться в сторис
-
           </button>
-
-          <div style={styles.box}>
-
-            <div style={styles.msg}>
-              ❤️ Кто-то тайно влюблён в тебя
-            </div>
-
-            <div style={styles.msg}>
-              🔥 Ты нравишься одному другу
-            </div>
-
-            <button style={styles.lock}
-              onClick={buyVoices}>
-
-              🔒 Узнать кто ответил — 3 голоса
-
-            </button>
-
-          </div>
 
         </div>
 
@@ -254,16 +230,12 @@ export default function App() {
 
           <button style={styles.btn}
             onClick={requestFriends}>
-
             Продолжить
-
           </button>
 
           <button style={styles.btn}
             onClick={() => setScreen("menu")}>
-
             Назад
-
           </button>
 
         </div>
@@ -311,9 +283,7 @@ export default function App() {
 
           <button style={styles.btn}
             onClick={() => setScreen("menu")}>
-
             Назад
-
           </button>
 
         </div>
@@ -343,9 +313,7 @@ export default function App() {
             <button key={i}
               style={styles.answer}
               onClick={() => answerClick(a)}>
-
               {a}
-
             </button>
 
           ))}
@@ -370,9 +338,7 @@ export default function App() {
 
           <button style={styles.btn}
             onClick={() => setScreen("menu")}>
-
             На главный экран
-
           </button>
 
         </div>
@@ -409,9 +375,7 @@ export default function App() {
 
           <button style={styles.btn}
             onClick={() => setScreen("menu")}>
-
             Назад
-
           </button>
 
         </div>
@@ -425,7 +389,6 @@ export default function App() {
 }
 
 const styles = {
-
   bg: {
     minHeight: "100vh",
     background: "linear-gradient(160deg,#6a3cff,#9b4dff,#ff6aa6)",
@@ -435,22 +398,18 @@ const styles = {
     fontFamily: "Arial",
     padding: "20px"
   },
-
   container: {
     width: "360px",
     textAlign: "center",
     color: "white"
   },
-
   title: {
     fontSize: "34px",
     fontWeight: "700"
   },
-
   subtitle: {
     marginBottom: "20px"
   },
-
   btn: {
     width: "100%",
     padding: "16px",
@@ -462,7 +421,6 @@ const styles = {
     background: "#ff4ecd",
     color: "white"
   },
-
   search: {
     width: "100%",
     padding: "12px",
@@ -470,7 +428,6 @@ const styles = {
     border: "none",
     marginBottom: "10px"
   },
-
   card: {
     width: "340px",
     background: "rgba(255,255,255,0.15)",
@@ -478,11 +435,6 @@ const styles = {
     borderRadius: "20px",
     color: "white"
   },
-
-  box: {
-    marginTop: "20px"
-  },
-
   msg: {
     background: "white",
     color: "#111",
@@ -490,17 +442,6 @@ const styles = {
     borderRadius: "10px",
     marginTop: "8px"
   },
-
-  lock: {
-    width: "100%",
-    padding: "12px",
-    marginTop: "10px",
-    borderRadius: "30px",
-    border: "none",
-    background: "#7a5cff",
-    color: "white"
-  },
-
   friend: {
     display: "flex",
     alignItems: "center",
@@ -512,13 +453,11 @@ const styles = {
     marginTop: "8px",
     cursor: "pointer"
   },
-
   avatar: {
     width: "40px",
     height: "40px",
     borderRadius: "50%"
   },
-
   answer: {
     width: "100%",
     padding: "14px",
@@ -529,5 +468,4 @@ const styles = {
     color: "white",
     cursor: "pointer"
   }
-
 }
