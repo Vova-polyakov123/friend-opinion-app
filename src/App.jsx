@@ -13,8 +13,6 @@ export default function App() {
   const [selectedFriend, setSelectedFriend] = useState(null)
 
   const [qIndex, setQIndex] = useState(0)
-  const [answers, setAnswers] = useState([])
-
   const [inbox, setInbox] = useState([])
 
   useEffect(() => {
@@ -29,7 +27,7 @@ export default function App() {
 
         setUser(userInfo)
 
-        loadInbox(userInfo.id)
+        await loadInbox(userInfo.id)
 
       } catch (e) { console.log(e) }
 
@@ -66,6 +64,16 @@ export default function App() {
 
   }
 
+  async function openInbox() {
+
+    if (!user) return
+
+    await loadInbox(user.id)
+
+    setScreen("inbox")
+
+  }
+
   async function requestFriends() {
 
     try {
@@ -97,7 +105,6 @@ export default function App() {
 
     setSelectedFriend(friend)
     setQIndex(0)
-    setAnswers([])
 
     setScreen("quiz")
 
@@ -149,12 +156,12 @@ export default function App() {
 
         background_type: "image",
 
-        url: "https://friend-opinion-app-o7ah.vercel.app/story.png",
+        background_url:
+          "https://friend-opinion-app-o7ah.vercel.app/story.png",
 
         attachment: {
           type: "url",
-          url: "https://vk.com/app54474085",
-          text: "Играть"
+          url: "https://vk.com/app54474085"
         }
 
       })
@@ -178,22 +185,46 @@ export default function App() {
 
           <h1 style={styles.title}>🔥 Тайное мнение друзей</h1>
 
-          <p style={styles.subtitle}>Узнай что друзья думают о тебе</p>
+          <p style={styles.subtitle}>
+            Узнай что друзья думают о тебе
+          </p>
 
-          <button style={styles.btn} onClick={() => setScreen("intro")}>👥 Начать</button>
+          <button style={styles.btn}
+            onClick={() => setScreen("intro")}>
 
-          <button style={styles.btn} onClick={() => loadInbox(user.id) || setScreen("inbox")}>✉ Мои ответы</button>
+            👥 Начать
 
-          <button style={styles.btn} onClick={shareStory}>📲 Поделиться в сторис</button>
+          </button>
+
+          <button style={styles.btn}
+            onClick={openInbox}>
+
+            ✉ Мои ответы
+
+          </button>
+
+          <button style={styles.btn}
+            onClick={shareStory}>
+
+            📲 Поделиться в сторис
+
+          </button>
 
           <div style={styles.box}>
 
-            <div style={styles.msg}>❤️ Кто-то тайно влюблён в тебя</div>
+            <div style={styles.msg}>
+              ❤️ Кто-то тайно влюблён в тебя
+            </div>
 
-            <div style={styles.msg}>🔥 Ты нравишься одному другу</div>
+            <div style={styles.msg}>
+              🔥 Ты нравишься одному другу
+            </div>
 
-            <button style={styles.lock} onClick={buyVoices}>
+            <button style={styles.lock}
+              onClick={buyVoices}>
+
               🔒 Узнать кто ответил — 3 голоса
+
             </button>
 
           </div>
@@ -216,11 +247,24 @@ export default function App() {
 
           <h2>Как это работает</h2>
 
-          <p>Выбери друга и ответь на вопросы. Ответ будет отправлен анонимно.</p>
+          <p>
+            Выбери друга и ответь на вопросы.
+            Ответ будет отправлен анонимно.
+          </p>
 
-          <button style={styles.btn} onClick={requestFriends}>Продолжить</button>
+          <button style={styles.btn}
+            onClick={requestFriends}>
 
-          <button style={styles.btn} onClick={() => setScreen("menu")}>Назад</button>
+            Продолжить
+
+          </button>
+
+          <button style={styles.btn}
+            onClick={() => setScreen("menu")}>
+
+            Назад
+
+          </button>
 
         </div>
 
@@ -249,10 +293,13 @@ export default function App() {
 
           {filteredFriends.map(f => (
 
-            <div key={f.id} style={styles.friend} onClick={() => startQuiz(f)}>
+            <div key={f.id}
+              style={styles.friend}
+              onClick={() => startQuiz(f)}>
 
               <img
-                src={f.photo_100 || "https://vk.com/images/camera_200.png"}
+                src={f.photo_100 ||
+                  "https://vk.com/images/camera_200.png"}
                 style={styles.avatar}
               />
 
@@ -262,7 +309,12 @@ export default function App() {
 
           ))}
 
-          <button style={styles.btn} onClick={() => setScreen("menu")}>Назад</button>
+          <button style={styles.btn}
+            onClick={() => setScreen("menu")}>
+
+            Назад
+
+          </button>
 
         </div>
 
@@ -288,8 +340,12 @@ export default function App() {
 
           {q.a.map((a, i) => (
 
-            <button key={i} style={styles.answer} onClick={() => answerClick(a)}>
+            <button key={i}
+              style={styles.answer}
+              onClick={() => answerClick(a)}>
+
               {a}
+
             </button>
 
           ))}
@@ -312,8 +368,11 @@ export default function App() {
 
           <h2>Ответ отправлен</h2>
 
-          <button style={styles.btn} onClick={() => setScreen("menu")}>
+          <button style={styles.btn}
+            onClick={() => setScreen("menu")}>
+
             На главный экран
+
           </button>
 
         </div>
@@ -334,6 +393,12 @@ export default function App() {
 
           <h2>Ответы</h2>
 
+          {inbox.length === 0 &&
+            <div style={styles.msg}>
+              Пока нет ответов
+            </div>
+          }
+
           {inbox.map((m, i) => (
 
             <div key={i} style={styles.msg}>
@@ -342,8 +407,11 @@ export default function App() {
 
           ))}
 
-          <button style={styles.btn} onClick={() => setScreen("menu")}>
+          <button style={styles.btn}
+            onClick={() => setScreen("menu")}>
+
             Назад
+
           </button>
 
         </div>
