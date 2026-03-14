@@ -130,27 +130,21 @@ export default function App() {
 
     try {
 
+      const imageUrl = window.location.origin + "/story.png";
+
       await bridge.send("VKWebAppShowStoryBox", {
-
         background_type: "image",
-        url: window.location.origin + "/story.png",
-
-        attachment: {
-          type: "url",
-          url: `https://vk.com/appXXXX#${user?.id}`,
-          text: "to_store"
-        }
-
+        url: imageUrl
       })
 
     } catch (e) {
 
+      console.log(e)
       alert("Ошибка сторис")
 
     }
 
   }
-
   if (screen === "menu") {
 
     return (
