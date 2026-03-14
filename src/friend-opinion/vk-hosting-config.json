@@ -1,0 +1,6 @@
+{
+    "public_path": "/",
+    "navigation_fallback": {
+        "rewrite": "/index.html"
+    }
+}
