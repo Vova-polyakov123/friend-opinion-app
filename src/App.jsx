@@ -141,7 +141,7 @@ export default function App() {
 
         attachment: {
           type: "url",
-          url: "https://vk.com/appXXXX",
+          url: "https://vk.com/app54474085",
           text: "Играть"
         },
 
