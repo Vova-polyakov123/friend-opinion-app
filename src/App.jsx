@@ -127,33 +127,32 @@ export default function App() {
 
   async function shareStory() {
 
-    if (!user) {
-      alert("Подождите загрузку пользователя");
-      return;
-    }
-
     try {
+
+      const storyUrl = "https://friend-opinion-app-o7ah.vercel.app/story.png"
 
       await bridge.send("VKWebAppShowStoryBox", {
 
-        background_type: "color",
-        background_color: "#6a3cff",
+        background_type: "image",
+        url: storyUrl,
 
         attachment: {
           type: "url",
           url: "https://vk.com/app54474085",
           text: "Играть"
-        },
+        }
 
-        text: "Узнай что друзья думают о тебе 🔥"
+      })
 
-      });
+    } catch (error) {
 
-    } catch (e) {
+      console.error("Story error:", error)
 
-      console.log(e);
-
-      alert("Ошибка сторис");
+      if (error.error_data) {
+        alert("VK ошибка: " + error.error_data.error_reason)
+      } else {
+        alert("Не удалось открыть сторис")
+      }
 
     }
 
