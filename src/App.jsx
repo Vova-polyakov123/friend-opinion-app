@@ -133,7 +133,7 @@ export default function App() {
       await bridge.send("VKWebAppShowStoryBox", {
 
         background_type: "image",
-        url: "https://i.imgur.com/8Km9tLL.png",
+        url: window.location.origin + "/story.png",
 
         attachment: {
           type: "url",
