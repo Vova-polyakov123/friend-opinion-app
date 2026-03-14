@@ -27,9 +27,11 @@ export default function App() {
 
         setUser(userInfo)
 
-        await loadInbox(userInfo.id)
+        loadInbox(userInfo.id)
 
-      } catch (e) { console.log(e) }
+      } catch (e) {
+        console.log("VK init error", e)
+      }
 
     }
 
@@ -64,7 +66,9 @@ export default function App() {
 
       }
 
-    } catch (e) { console.log(e) }
+    } catch (e) {
+      console.log(e)
+    }
 
   }
 
@@ -131,7 +135,9 @@ export default function App() {
 
       })
 
-    } catch (e) { console.log(e) }
+    } catch (e) {
+      console.log(e)
+    }
 
     if (qIndex < questions.length - 1) {
 
@@ -157,17 +163,14 @@ export default function App() {
           "https://friend-opinion-app-o7ah.vercel.app/story.png",
 
         open_url:
-          "https://vk.com/app54474085",
-
-        attachment: {
-          text: "Тайное мнение друзей"
-        }
+          "https://vk.com/app54474085"
 
       })
 
     } catch (e) {
 
-      console.log(e)
+      console.log("Story error", e)
+
       alert("Ошибка сторис")
 
     }
@@ -389,6 +392,7 @@ export default function App() {
 }
 
 const styles = {
+
   bg: {
     minHeight: "100vh",
     background: "linear-gradient(160deg,#6a3cff,#9b4dff,#ff6aa6)",
@@ -398,18 +402,22 @@ const styles = {
     fontFamily: "Arial",
     padding: "20px"
   },
+
   container: {
     width: "360px",
     textAlign: "center",
     color: "white"
   },
+
   title: {
     fontSize: "34px",
     fontWeight: "700"
   },
+
   subtitle: {
     marginBottom: "20px"
   },
+
   btn: {
     width: "100%",
     padding: "16px",
@@ -421,6 +429,7 @@ const styles = {
     background: "#ff4ecd",
     color: "white"
   },
+
   search: {
     width: "100%",
     padding: "12px",
@@ -428,6 +437,7 @@ const styles = {
     border: "none",
     marginBottom: "10px"
   },
+
   card: {
     width: "340px",
     background: "rgba(255,255,255,0.15)",
@@ -435,6 +445,7 @@ const styles = {
     borderRadius: "20px",
     color: "white"
   },
+
   msg: {
     background: "white",
     color: "#111",
@@ -442,6 +453,7 @@ const styles = {
     borderRadius: "10px",
     marginTop: "8px"
   },
+
   friend: {
     display: "flex",
     alignItems: "center",
@@ -453,11 +465,13 @@ const styles = {
     marginTop: "8px",
     cursor: "pointer"
   },
+
   avatar: {
     width: "40px",
     height: "40px",
     borderRadius: "50%"
   },
+
   answer: {
     width: "100%",
     padding: "14px",
@@ -468,4 +482,5 @@ const styles = {
     color: "white",
     cursor: "pointer"
   }
+
 }
