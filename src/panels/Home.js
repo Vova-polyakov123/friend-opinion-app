@@ -1,70 +1,36 @@
-import React, { useState } from "react";
-import { Panel, PanelHeader, Button, Div } from "@vkontakte/vkui";
+import bridge from "@vkontakte/vk-bridge"
 
-const questions = [
-    {
-        question: "Насколько он хороший друг?",
-        answers: ["⭐", "⭐⭐", "⭐⭐⭐", "⭐⭐⭐⭐", "⭐⭐⭐⭐⭐"]
-    },
-    {
-        question: "Можно ли на него положиться?",
-        answers: ["Нет", "Иногда", "Да"]
-    },
-    {
-        question: "Он веселый?",
-        answers: ["Нет", "Иногда", "Очень"]
-    },
-    {
-        question: "Он романтичный?",
-        answers: ["Нет", "Немного", "Очень"]
-    }
-];
+function Home({ start }) {
 
-export const Home = ({ id }) => {
+    const shareStory = async () => {
 
-    const [step, setStep] = useState(0);
-    const [answers, setAnswers] = useState([]);
+        await bridge.send("VKWebAppShowStoryBox", {
 
-    function choose(answer) {
+            background_type: "image",
+            url: window.location.origin + "/story.png"
 
-        setAnswers([...answers, answer]);
-
-        if (step + 1 < questions.length) {
-            setStep(step + 1);
-        } else {
-            alert("Опрос отправлен!");
-        }
+        })
 
     }
 
     return (
 
-        <Panel id={id}>
+        <div>
 
-            <PanelHeader>
-                Что думают друзья
-            </PanelHeader>
+            <h1>Оцени друзей</h1>
 
-            <Div>
+            <button onClick={start}>
+                Начать
+            </button>
 
-                <h3>{questions[step].question}</h3>
+            <button onClick={shareStory}>
+                Поделиться в сторис
+            </button>
 
-                {questions[step].answers.map((a) => (
-                    <Button
-                        key={a}
-                        size="l"
-                        stretched
-                        style={{ marginBottom: 10 }}
-                        onClick={() => choose(a)}
-                    >
-                        {a}
-                    </Button>
-                ))}
+        </div>
 
-            </Div>
+    )
 
-        </Panel>
+}
 
-    );
-
-};
+export default Home

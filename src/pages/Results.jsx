@@ -1,76 +1,55 @@
-import { useState } from "react";
-import bridge from "@vkontakte/vk-bridge";
+import { useEffect, useState } from "react"
+import axios from "axios"
+import bridge from "@vkontakte/vk-bridge"
 
-export default function Results() {
+function Results({ user }) {
 
-    const shareResult = () => {
-        bridge.send("VKWebAppShowWallPostBox", {
-            message: "🔥 Пройди опрос и узнай что о тебе думают друзья!",
-            attachments: window.location.href
-        });
-    };
+    const [answers, setAnswers] = useState([])
 
-    const inviteFriends = () => {
-        bridge.send("VKWebAppShowInviteBox");
-    };
+    useEffect(() => {
 
-    const copyLink = () => {
-        navigator.clipboard.writeText(window.location.href);
-        alert("Ссылка скопирована");
-    };
+        axios.get("/api/get?user=" + user.id)
+            .then(res => {
+                setAnswers(res.data.answers)
+            })
 
-    // выбор друга и отправка сообщения
-    const sendToFriend = async () => {
+    }, [])
 
-        try {
+    const pay = async () => {
 
-            const friend = await bridge.send("VKWebAppShowFriendPicker");
+        await bridge.send("VKWebAppOpenPayForm", {
 
-            const user_id = friend.id;
+            app_id: 1234567,
+            action: "pay-to-service",
 
-            await fetch("/send", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    user_id: user_id
-                })
-            });
+            params: {
+                amount: 5
+            }
 
-            alert("Сообщение отправлено другу");
+        })
 
-        } catch (error) {
-
-            console.log(error);
-
-            alert("Не удалось отправить");
-
-        }
-
-    };
+    }
 
     return (
+
         <div>
 
-            <h2>Опрос завершён</h2>
+            <h2>Ответы</h2>
 
-            <button onClick={shareResult}>
-                📢 Поделиться
-            </button>
+            {answers.map((a, i) => (
+                <div key={i}>
+                    {a.question}
+                </div>
+            ))}
 
-            <button onClick={inviteFriends}>
-                👥 Пригласить друзей
-            </button>
-
-            <button onClick={sendToFriend}>
-                ✉ Отправить другу
-            </button>
-
-            <button onClick={copyLink}>
-                🔗 Скопировать ссылку
+            <button onClick={pay}>
+                Открыть секретные ответы (5 голосов)
             </button>
 
         </div>
-    );
+
+    )
+
 }
+
+export default Results

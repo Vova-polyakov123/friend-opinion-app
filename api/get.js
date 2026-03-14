@@ -1,15 +1,11 @@
-export default async function handler(req, res) {
-    const response = await fetch(
-        process.env.SUPABASE_URL + "/rest/v1/answers?select=*",
-        {
-            headers: {
-                apikey: process.env.SUPABASE_KEY,
-                Authorization: "Bearer " + process.env.SUPABASE_KEY
-            }
-        }
-    );
+let answers = []
 
-    const data = await response.json();
+export default function handler(req, res) {
 
-    res.status(200).json(data);
+    const user = req.query.user
+
+    const result = answers.filter(a => a.to == user)
+
+    res.json({ answers: result })
+
 }
