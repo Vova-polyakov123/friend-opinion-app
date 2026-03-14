@@ -53,7 +53,6 @@ export default function App() {
     try {
 
       const res = await bridge.send("VKWebAppGetFriends");
-
       const list = res.items || res.users || [];
 
       setFriends(list);
@@ -63,9 +62,7 @@ export default function App() {
     } catch (e) {
 
       console.log(e);
-
       setFriendsError(true);
-
       alert("Разрешите доступ к друзьям");
 
     }
@@ -83,7 +80,6 @@ export default function App() {
     setSelectedFriend(friend);
     setQIndex(0);
     setAnswers([]);
-
     setScreen("quiz");
 
   }
@@ -99,7 +95,6 @@ export default function App() {
     } else {
 
       setInbox(prev => [...prev, "💌 Кто-то ответил про тебя"]);
-
       setScreen("result");
 
     }
@@ -129,30 +124,23 @@ export default function App() {
 
     try {
 
-      const storyUrl = "https://friend-opinion-app-o7ah.vercel.app/story.png"
-
       await bridge.send("VKWebAppShowStoryBox", {
 
         background_type: "image",
-        url: storyUrl,
+        url: "https://friend-opinion-app-o7ah.vercel.app/story.png",
 
         attachment: {
           type: "url",
           url: "https://vk.com/app54474085",
-          text: "Играть"
+          text: "play"
         }
 
-      })
+      });
 
     } catch (error) {
 
-      console.error("Story error:", error)
-
-      if (error.error_data) {
-        alert("VK ошибка: " + error.error_data.error_reason)
-      } else {
-        alert("Не удалось открыть сторис")
-      }
+      console.error("Story error:", error);
+      alert("Ошибка сторис");
 
     }
 
@@ -308,9 +296,7 @@ export default function App() {
               style={styles.answer}
               onClick={() => answerClick(a)}
             >
-
               {a}
-
             </button>
 
           ))}
@@ -378,7 +364,6 @@ export default function App() {
 }
 
 const styles = {
-
   bg: {
     minHeight: "100vh",
     background: "linear-gradient(160deg,#6a3cff,#9b4dff,#ff6aa6)",
@@ -388,22 +373,18 @@ const styles = {
     fontFamily: "Arial",
     padding: "20px"
   },
-
   container: {
     width: "360px",
     textAlign: "center",
     color: "white"
   },
-
   title: {
     fontSize: "34px",
     fontWeight: "700"
   },
-
   subtitle: {
     marginBottom: "20px"
   },
-
   btn: {
     width: "100%",
     padding: "16px",
@@ -415,7 +396,6 @@ const styles = {
     background: "#ff4ecd",
     color: "white"
   },
-
   search: {
     width: "100%",
     padding: "12px",
@@ -423,7 +403,6 @@ const styles = {
     border: "none",
     marginBottom: "10px"
   },
-
   card: {
     width: "340px",
     background: "rgba(255,255,255,0.15)",
@@ -431,11 +410,9 @@ const styles = {
     borderRadius: "20px",
     color: "white"
   },
-
   box: {
     marginTop: "20px"
   },
-
   msg: {
     background: "white",
     color: "#111",
@@ -443,7 +420,6 @@ const styles = {
     borderRadius: "10px",
     marginTop: "8px"
   },
-
   lock: {
     width: "100%",
     padding: "12px",
@@ -453,7 +429,6 @@ const styles = {
     background: "#7a5cff",
     color: "white"
   },
-
   friend: {
     display: "flex",
     alignItems: "center",
@@ -465,13 +440,11 @@ const styles = {
     marginTop: "8px",
     cursor: "pointer"
   },
-
   avatar: {
     width: "40px",
     height: "40px",
     borderRadius: "50%"
   },
-
   answer: {
     width: "100%",
     padding: "14px",
@@ -482,5 +455,4 @@ const styles = {
     color: "white",
     cursor: "pointer"
   }
-
 };
