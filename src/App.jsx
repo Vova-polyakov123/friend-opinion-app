@@ -127,22 +127,20 @@ export default function App() {
   }
 
   async function shareStory() {
-
     try {
 
-      const imageUrl = window.location.origin + "/story.png";
+      const response = await fetch("/story.png")
+      const blob = await response.blob()
 
       await bridge.send("VKWebAppShowStoryBox", {
         background_type: "image",
-        url: imageUrl,
-
+        blob: blob,
         attachment: {
           type: "url",
-          url: "https://vk.com/appYOUR_APP_ID",
-          text: "Открой приложение"
+          url: "https://vk.com/app54474085",
+          text: "Играть"
         }
-
-      });
+      })
 
     } catch (e) {
 
@@ -150,8 +148,8 @@ export default function App() {
       alert("Ошибка сторис")
 
     }
-
   }
+
   if (screen === "menu") {
 
     return (
