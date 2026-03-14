@@ -134,8 +134,15 @@ export default function App() {
 
       await bridge.send("VKWebAppShowStoryBox", {
         background_type: "image",
-        url: imageUrl
-      })
+        url: imageUrl,
+
+        attachment: {
+          type: "url",
+          url: "https://vk.com/appYOUR_APP_ID",
+          text: "Открой приложение"
+        }
+
+      });
 
     } catch (e) {
 
